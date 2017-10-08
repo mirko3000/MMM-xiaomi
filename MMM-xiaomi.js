@@ -15,11 +15,9 @@ Module.register('MMM-xiaomi', {
   requiresVersion: "2.0.0",
 
   defaults: {
-    fade: true,
-    fadePoint: 0.25,
-    gatewayIP: '192.168.0.9',
+    gatewayIP: '192.168.0.1',
     updateInterval: 5,
-    twoColLayout: false,
+    animationSpeed: 3000,
     graphicLayout: false
   },
 
@@ -29,7 +27,7 @@ Module.register('MMM-xiaomi', {
       if (notification === 'XIAOMI_DATA') {
           Log.info('received XIAOMI_DATA');
           this.render(payload);
-          this.updateDom(3000);
+          this.updateDom(this.config.animationSpeed);
       }
   },
 

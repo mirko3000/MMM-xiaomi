@@ -44,14 +44,21 @@ The following properties can be configured:
 			<td><code>gatewayIP</code></td>
 			<td>The IP address of your Xiaomi smarthome gateway.<br>
 				<br><b>Possible values:</b> <code>192.168.1.100</code>
-				<br><b>Default value:</b> <code>none</code>
+				<br><b>Default value:</b> <code>192.168.0.1</code>
 			</td>
 		</tr>
 		<tr>
-			<td><code>interval</code></td>
+			<td><code>updateInterval</code></td>
 			<td>The update interval in minutes.<br>
 				<br><b>Possible values:</b> <code>5</code>
 				<br><b>Default value:</b> <code>5</code>
+			</td>
+		</tr>
+		<tr>
+			<td><code>animationSpeed</code></td>
+			<td>Animation speed on refreshing the display (in ms)<br>
+				<br><b>Possible values:</b> <code>3000</code>
+				<br><b>Default value:</b> <code>3000</code>
 			</td>
 		</tr>
 		<tr>
