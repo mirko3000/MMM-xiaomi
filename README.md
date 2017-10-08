@@ -57,10 +57,10 @@ The following properties can be configured:
 		<tr>
 			<td><code>devices</code></td>
 			<td>List of configured devices.<br>Configure your device IDs to map to to a localized name. The library unfortunately cannot read out the room names, so you need to set them here manually. If no config is set here it will simply display the ID of the sensor (this can then be used to map it to a name).<br>
-				<br><b>Possible values:</b> <code>{
+				<br><b>Possible values:</b> <code>[{
 	            	id: '158d020172841d',
 	            	name: 'Living Room'
-	            },</code>
+	            }]</code>
 				<br><b>Default value:</b> <code>none</code>
 			</td>
 		</tr>
