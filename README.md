@@ -41,14 +41,14 @@ The following properties can be configured:
 	<thead>
 	<tbody>
 		<tr>
-			<td><code>interval</code></td>
-			<td>The IP address of your local MAX! cube.<br>
+			<td><code>gatewayIP</code></td>
+			<td>The IP address of your Xiaomi smarthome gateway.<br>
 				<br><b>Possible values:</b> <code>192.168.1.100</code>
 				<br><b>Default value:</b> <code>none</code>
 			</td>
 		</tr>
 		<tr>
-			<td><code>gatewayIP</code></td>
+			<td><code>interval</code></td>
 			<td>The update interval in minutes.<br>
 				<br><b>Possible values:</b> <code>5</code>
 				<br><b>Default value:</b> <code>5</code>
@@ -56,9 +56,12 @@ The following properties can be configured:
 		</tr>
 		<tr>
 			<td><code>devices</code></td>
-			<td>Defines the layout either in a single or 2-column layout. In false the single column layout is used.<br>
-				<br><b>Possible values:</b> <code>true</code>
-				<br><b>Default value:</b> <code>false</code>
+			<td>List of configured devices.<br>Configure your device IDs to map to to a localized name. The library unfortunately cannot read out the room names, so you need to set them here manually. If no config is set here it will simply display the ID of the sensor (this can then be used to map it to a name).<br>
+				<br><b>Possible values:</b> <code>{
+	            	id: '158d020172841d',
+	            	name: 'Living Room'
+	            },</code>
+				<br><b>Default value:</b> <code>none</code>
 			</td>
 		</tr>
 	</tbody>
