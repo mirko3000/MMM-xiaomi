@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/paviro/MMM-Wunderlist"
+    "url": "git+https://github.com/mirko3000/MMM-xiaomi"
   },
   "keywords": [
     "magic mirror",
@@ -13,14 +13,11 @@
     "module"
   ],
   "author": "Mirko Bleyh",
-  "contributors": [
-    "https://github.com/paviro/MMM-Wunderlist/graphs/contributors"
-  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/paviro/MMM-Wunderlist/issues"
+    "url": "https://github.com/mirko3000/MMM-xiaomi/issues"
   },
-  "homepage": "https://github.com/paviro/MMM-Wunderlist#readme",
+  "homepage": "https://github.com/mirko3000/MMM-xiaomi#readme",
   "dependencies": {
     "miio": "^0.13.0"
   }
