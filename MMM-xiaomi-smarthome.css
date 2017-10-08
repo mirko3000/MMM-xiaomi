@@ -1,0 +1,39 @@
+.xiaomi {
+    position: relative;
+}
+
+.room {
+  font-size: 16px;
+  margin-bottom: -15px;
+  z-index: 5;
+}
+
+.room-title {
+  display: inline-block;
+  width: 40%;
+  z-index: 5;
+}
+
+.room-bars {
+  display: inline-block;
+  width: 60%;
+  z-index: 5;
+}
+
+.legend-temp {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  background-color: darkgrey;
+  left: 9%;
+  z-index: 0;
+}
+
+.legend-humid {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  background-color: darkgrey;
+  left: 42%;
+  z-index: 0;
+}

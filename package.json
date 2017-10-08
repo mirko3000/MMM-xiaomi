@@ -1,0 +1,27 @@
+{
+  "name": "Magic-Mirror-Module-Xiaomi-Smarthome",
+  "description": "Xiaomi Smarthome module for the Magic Mirror.",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paviro/MMM-Wunderlist"
+  },
+  "keywords": [
+    "magic mirror",
+    "smart mirror",
+    "wunderlist",
+    "module"
+  ],
+  "author": "Mirko Bleyh",
+  "contributors": [
+    "https://github.com/paviro/MMM-Wunderlist/graphs/contributors"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/paviro/MMM-Wunderlist/issues"
+  },
+  "homepage": "https://github.com/paviro/MMM-Wunderlist#readme",
+  "dependencies": {
+    "miio": "^0.13.0"
+  }
+}
