@@ -10,7 +10,7 @@
   var cache = [];
   var cacheIndex = [];
 
-Module.register('MMM-xiaomi-smarthome', {
+Module.register('MMM-xiaomi', {
 
   requiresVersion: "2.0.0",
 
@@ -56,7 +56,7 @@ Module.register('MMM-xiaomi-smarthome', {
   },
 
   getStyles: function() {
-    return ['MMM-xiaomi-smarthome.css'];
+    return ['MMM-xiaomi.css'];
   },
 
   getDom: function() {
