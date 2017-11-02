@@ -48,6 +48,13 @@ The following properties can be configured:
 			</td>
 		</tr>
 		<tr>
+			<td><code>gatewayToken</code></td>
+			<td>The optional authentification token for your gateway in case your device does not allow direct access.<br>
+				<br><b>Possible values:</b> <code>cfbdb215c0824fcc971917e36822fcbe</code>
+				<br><b>Default value:</b> <code>none/code>
+			</td>
+		</tr>
+		<tr>
 			<td><code>updateInterval</code></td>
 			<td>The update interval in minutes.<br>
 				<br><b>Possible values:</b> <code>5</code>
@@ -73,6 +80,13 @@ The following properties can be configured:
 		</tr>
 	</tbody>
 </table>
+
+## Authentification
+
+In case you need a security token to access your gateway you can provide this token via the configuration parameters. To find out the correct token do the following:
+1. Install miio command line tools via 'npm install -g miio'
+2. Discover your devices via 'miio --discover'
+3. In your gateway device you can now see the security token required, use this in the configuration
 
 
 ## Base API
