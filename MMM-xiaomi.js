@@ -42,7 +42,10 @@ Module.register('MMM-xiaomi', {
 
   update: function(){
     this.sendSocketNotification(
-      'XIAOMI_UPDATE', this.config.gatewayIP);
+      'XIAOMI_UPDATE', {
+          ip : this.config.gatewayIP, 
+          token: this.config.gatewayToken
+      });
 
   },
 
