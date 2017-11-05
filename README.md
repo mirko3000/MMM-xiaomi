@@ -2,7 +2,9 @@
 Additional Module for MagicMirror²  https://github.com/MichMich/MagicMirror/
 
 # Module: MMM max
-This module displays temperatur and humidity readings from your Xiaomi smart home sensors.
+This module displays temperatur and humidity readings from your Xiaomi smart home sensors. It also calculates recommended ventilation for your indoor rooms in case the humidity exceed 60%. This requires an outside sensor to take into account the outside humidity and temperature.
+
+<a href="https://imgbb.com/"><img src="https://image.ibb.co/epywnb/Bildschirmfoto_2017_11_05_um_15_17_36.png" alt="Bildschirmfoto_2017_11_05_um_15_17_36" border="0"></a><br /><a target='_blank' href='https://de.imgbb.com/'>upload photo</a><br />
 
 ## Installation
 
@@ -17,7 +19,7 @@ modules: [
     {
 		module: 'MMM-xiaomi',
 		position: 'bottom_left',
-		header: 'Temperatur / Feuchtigkeit',  // This is optional
+		header: 'Temperature / Humidity',  // This is optional
 		config: {
 			// See 'Configuration options' for more information.
 		}
@@ -51,7 +53,7 @@ The following properties can be configured:
 			<td><code>gatewayToken</code></td>
 			<td>The optional authentification token for your gateway in case your device does not allow direct access.<br>
 				<br><b>Possible values:</b> <code>cfbdb215c0824fcc971917e36822fcbe</code>
-				<br><b>Default value:</b> <code>none/code>
+				<br><b>Default value:</b> <code>none</code>
 			</td>
 		</tr>
 		<tr>
@@ -62,10 +64,10 @@ The following properties can be configured:
 			</td>
 		</tr>
 		<tr>
-			<td><code>animationSpeed</code></td>
-			<td>Animation speed on refreshing the display (in ms)<br>
-				<br><b>Possible values:</b> <code>3000</code>
-				<br><b>Default value:</b> <code>3000</code>
+			<td><code>outsideSensorId</code></td>
+			<td>In case you have an sensor outside you can provide the ID here. This is used to calculate ventilation effects.<br>
+				<br><b>Possible values:</b> <code>158d020172841d</code>
+				<br><b>Default value:</b> <code>none</code>
 			</td>
 		</tr>
 		<tr>

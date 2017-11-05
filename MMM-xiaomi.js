@@ -1,14 +1,11 @@
 /* global Module */
 
 /* Magic Mirror
- * Module: MMM-xiaomi-smarthome
+ * Module: MMM-xiaomi
  *
  * By mirko3000
  * MIT Licensed.
  */
-
-  var cache = [];
-  var cacheIndex = [];
 
 Module.register('MMM-xiaomi', {
 
@@ -74,7 +71,7 @@ Module.register('MMM-xiaomi', {
   html: {
     table: '<table class="xsmall">{0}</table>',
     // table: '<div style="border:1px solid white; width:1px; height:100%; position:absolute"/><table class="xsmall">{0}</table>',
-    col: '<td align="left" class="normal light small">{0}</td><td align="left" class="dimmed light xsmall">{1}°C</td><td align="left" class="dimmed light xsmall">{2}%</td>',
+    col: '<td align="left" class="normal light small">{0}</td><td align="left" class="dimmed light xsmall">{1}°C</td><td align="left" class="dimmed light xsmall">{2}%</td><td align="left" class="fa fa-1 {3}"></td>',
     row: '<tr>{0}{1}</tr>',
     room: '<li><div class="room xsmall">{0} : {1}°C - {2}%</div></li>',
     loading: '<div class="dimmed light xsmall">Connecting to Xiaomi gateway...</div>',
@@ -93,12 +90,80 @@ Module.register('MMM-xiaomi', {
 
   render: function(data) {
 
+    // Calculate some utility info first
+    var outsideTemp;
+    var outsideHumid;
+    var outsideAbsoluteHumid
+    var self = this
+
+    // If we have an outside sensor we can calculate ventilation effects
+    if (this.config.outsideSensorId != null) {
+      // Find the outside sensor
+      data.forEach(function(sensor) {
+        if (sensor.id === self.config.outsideSensorId) {
+          outsideTemp = sensor.temperature
+          outsideHumid = sensor.humidity
+          
+          outsideAbsoluteHumid = self.calculateAbsoluteHumidity(sensor.temperature, sensor.humidity)
+        }
+      });
+
+
+      // Now calculate the ventialtion effect for each indoor room
+      data.forEach(function(sensor) {
+        if (outsideAbsoluteHumid != null) {
+          sensor.absoluteHumidity = self.calculateAbsoluteHumidity(sensor.temperature, sensor.humidity)
+          if (sensor.absoluteHumidity > outsideAbsoluteHumid) {
+            sensor.ventilatationUseful = true
+          }
+        }
+        else {
+          sensor.ventilatationUseful = true
+        }
+      });
+    }
+
     if (this.config.graphicLayout) {
       this.renderProgress(data);
     }
     else {
       this.renderText(data);
     }
+
+  },
+
+
+  calculateAbsoluteHumidity: function(temp, humidity) {
+    // T = temperature
+    // r = relative humidity
+    // a = 7.5, b = 237.3 (for positive temperature)
+    // a = 7.6, b = 240.7 (for negative temperature)
+    var T = temp
+    var r = humidity
+    var a = 7.5
+    var b = 237.3
+
+    // R = 8314.3 J/(kmol*K) (universelle Gaskonstante)
+    // mw = 18.016 kg/kmol (Molekulargewicht des Wasserdampfes)
+    var R = 8314.3
+    var mw = 18.016
+
+    // DD = Steam pressure
+    // TK = temperature in kelvin
+    // SDD = Saturation steam pressure
+
+    // TK = T + 273.15
+    var TK = T + 273.15
+
+    // SDD(T) = 6.1078 * 10^((a*T)/(b+T))
+    var SDD = 6.1078 * Math.pow(10,(a*T)/(b+T))
+
+    // DD(r,T) = r/100 * SDD(T)
+    var DD = r/100 * SDD
+
+    // absoluteHumidty = 10^5 * mw/R* * DD(r,T)/TK
+    var absoluteHumidity = Math.pow(10,5) * (mw/R) * (DD/TK)
+    return absoluteHumidity
 
   },
 
@@ -210,25 +275,18 @@ Module.register('MMM-xiaomi', {
       $.each(data, function (i, item) {
         if (item != null) {
           
+          var ventilate = false
+          if (item.humidity > 60 && item.ventilatationUseful) {
+            ventilate = true
+          }
+
           var room = {
             id: item.id,
             name: item.id,
             temp: item.temperature,
-            humid: item.humidity
+            humid: item.humidity,
+            vent : ventilate
           };
-
-          // Get previously cached entry - if exists
-          if (cacheIndex.indexOf(room.id) != -1) {
-            var cacheRoom = cache[cacheIndex.indexOf(room.id)];
-
-            // Update cache
-            cache[cacheIndex.indexOf(room.id)] = room;
-          }
-          else {
-            // Create new entry in cache
-            cacheIndex[cacheIndex.length] = room.id;
-            cache[cache.length] = room;
-          }
 
           // Try to resolve ID from config
           if (this.config.devices.find(x => x.id === room.id)) {
@@ -239,7 +297,9 @@ Module.register('MMM-xiaomi', {
           room.temp = Math.round(room.temp * 10) / 10
           room.humid = Math.round(room.humid)
 
-          var currCol = this.html.col.format(room.name, room.temp, room.humid);
+          var icon = room.vent ? "fa-refresh " : ""
+
+          var currCol = this.html.col.format(room.name, room.temp, room.humid, icon);
 
           if (i%2!=0 || !this.config.twoColLayout) {
             // start new row
