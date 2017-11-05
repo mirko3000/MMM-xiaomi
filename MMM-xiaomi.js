@@ -208,45 +208,48 @@ Module.register('MMM-xiaomi', {
       var rowCount = 0;
       var tableText = ''
       $.each(data, function (i, item) {
-        var room = {
-          id: item.id,
-          name: item.id,
-          temp: item.temperature,
-          humid: item.humidity
-        };
+        if (item != null) {
+          
+          var room = {
+            id: item.id,
+            name: item.id,
+            temp: item.temperature,
+            humid: item.humidity
+          };
 
-        // Get previously cached entry - if exists
-        if (cacheIndex.indexOf(room.id) != -1) {
-          var cacheRoom = cache[cacheIndex.indexOf(room.id)];
+          // Get previously cached entry - if exists
+          if (cacheIndex.indexOf(room.id) != -1) {
+            var cacheRoom = cache[cacheIndex.indexOf(room.id)];
 
-          // Update cache
-          cache[cacheIndex.indexOf(room.id)] = room;
-        }
-        else {
-          // Create new entry in cache
-          cacheIndex[cacheIndex.length] = room.id;
-          cache[cache.length] = room;
-        }
+            // Update cache
+            cache[cacheIndex.indexOf(room.id)] = room;
+          }
+          else {
+            // Create new entry in cache
+            cacheIndex[cacheIndex.length] = room.id;
+            cache[cache.length] = room;
+          }
 
-        // Try to resolve ID from config
-        if (this.config.devices.find(x => x.id === room.id)) {
-          room.name = this.config.devices.find(x => x.id === room.id).name
-        }   
+          // Try to resolve ID from config
+          if (this.config.devices.find(x => x.id === room.id)) {
+            room.name = this.config.devices.find(x => x.id === room.id).name
+          }   
 
-        // Format temperatur and humidity by rounding
-        room.temp = Math.round(room.temp * 10) / 10
-        room.humid = Math.round(room.humid)
+          // Format temperatur and humidity by rounding
+          room.temp = Math.round(room.temp * 10) / 10
+          room.humid = Math.round(room.humid)
 
-        var currCol = this.html.col.format(room.name, room.temp, room.humid);
+          var currCol = this.html.col.format(room.name, room.temp, room.humid);
 
-        if (i%2!=0 || !this.config.twoColLayout) {
-          // start new row
-          tableText += this.html.row.format(previousCol, currCol);
-          previousCol = '';
-          rowCount++;
-        }
-        else {
-          previousCol = currCol;
+          if (i%2!=0 || !this.config.twoColLayout) {
+            // start new row
+            tableText += this.html.row.format(previousCol, currCol);
+            previousCol = '';
+            rowCount++;
+          }
+          else {
+            previousCol = currCol;
+          }
         }
 
         //text += this.renderRoom(room, mode, temp, valve, time_until, locked);

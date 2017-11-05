@@ -48,14 +48,15 @@ module.exports = NodeHelper.create({
     var sensors = [];
 
     for (var i = 0; i < gateway.devices.length; i++) { 
-      //console.log(gateway.devices[i]);
+      var currentDevice = gateway.devices[i]
+      console.log("Found device with ID " + currentDevice.id  + " of type " + currentDevice.type);
 
       // Only handle sensors
       if (gateway.devices[i].type === 'sensor') {
         var newDev = {};
-        newDev.temperature = gateway.devices[i].temperature
-        newDev.humidity = gateway.devices[i].humidity
-        newDev.id = gateway.devices[i].id
+        newDev.temperature = currentDevice.temperature;
+        newDev.humidity = currentDevice.humidity;
+        newDev.id = currentDevice.id;
         sensors[i] = newDev;
       }
     }
