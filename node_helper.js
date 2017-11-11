@@ -66,10 +66,10 @@ module.exports = NodeHelper.create({
       console.log("Found device with ID " + currentDevice.id  + " of type " + currentDevice.type)
 
       // Register property change listener (only if not already known)
-      if (!this.deviceList[currentDevice.id]) {
+      //if (!this.deviceList[currentDevice.id]) {
         currentDevice.on('propertyChanged', e => self.propertyChanged(e));
-        this.deviceList[currentDevice.id] = currentDevice;
-      }
+        //this.deviceList[currentDevice.id] = currentDevice;
+      //}
 
       // Handle different devices types
       if (currentDevice.type === 'sensor') {

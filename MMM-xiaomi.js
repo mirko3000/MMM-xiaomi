@@ -80,7 +80,7 @@ Module.register('MMM-xiaomi', {
   html: {
     table: '<table class="xsmall">{0}</table>',
     // table: '<div style="border:1px solid white; width:1px; height:100%; position:absolute"/><table class="xsmall">{0}</table>',
-    col: '<td align="left" class="normal light small">{0}</td><td align="left" class="fa fa-angle-{6}"></td><td align="left" class="dimmed light xsmall">{1}°C</td><td align="left" class="fa fa-angle-{7}"></td><td align="left" class="dimmed light xsmall">{2}%</td><td align="center" class="fa fa-1 fa-refresh {3} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-star {4} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-power-off {5} xiaomi-icon"></td>',
+    col: '<td align="left" class="normal light small">{0}</td><td align="center" class="fa fa-angle-{6}"></td><td align="left" class="dimmed light xsmall">{1}°C</td><td align="center" class="fa fa-angle-{7}"></td><td align="left" class="dimmed light xsmall">{2}%</td><td align="center" class="fa fa-1 fa-refresh {3} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-star {4} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-power-off {5} xiaomi-icon"></td>',
     row: '<tr>{0}{1}</tr>',
     room: '<li><div class="room-item xsmall">{0} : {1}°C - {2}%</div></li>',
     loading: '<div class="dimmed light xsmall">Connecting to Xiaomi gateway...</div>',
