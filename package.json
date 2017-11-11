@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/mirko3000/MMM-xiaomi#readme",
   "dependencies": {
-    "miio": "^0.13.0"
+    "miio": "https://github.com/mirko3000/miio.git"
   }
 }

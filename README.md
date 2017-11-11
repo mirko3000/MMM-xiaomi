@@ -1,15 +1,15 @@
-# MMM-max
+# MMM-xiamo
 Additional Module for MagicMirror²  https://github.com/MichMich/MagicMirror/
 
-# Module: MMM max
-This module displays temperatur and humidity readings from your Xiaomi smart home sensors. It also calculates recommended ventilation for your indoor rooms in case the humidity exceed 60%. This requires an outside sensor to take into account the outside humidity and temperature.
+# Module: MMM-xiaomi
+This module displays data from your Xiaomi smart home sensors (temperature, humidity, window state, light state). It also calculates recommended ventilation for your indoor rooms in case the humidity exceed 60%. This requires an outside sensor to take into account the outside humidity and temperature.
 
 <a href="https://imgbb.com/"><img src="https://image.ibb.co/epywnb/Bildschirmfoto_2017_11_05_um_15_17_36.png" alt="Bildschirmfoto_2017_11_05_um_15_17_36" border="0"></a>
 
 ## Installation
 
-1. Navigate into your MagicMirror's modules folder and execute git clone https://github.com/mirko3000/MMM-xiaomi.git. A new folder will appear navigate into it.
-2. Execute npm install
+1. Navigate into your MagicMirror's modules folder and execute <code>git clone https://github.com/mirko3000/MMM-xiaomi</code>.git. A new folder will appear, navigate into it.
+2. Execute <code>npm install</code>
 
 ## Using the module
 
@@ -57,10 +57,10 @@ The following properties can be configured:
 			</td>
 		</tr>
 		<tr>
-			<td><code>updateInterval</code></td>
-			<td>The update interval in minutes.<br>
-				<br><b>Possible values:</b> <code>5</code>
-				<br><b>Default value:</b> <code>5</code>
+			<td><code>animationSpeed</code></td>
+			<td>The animation speed on refreshing data.<br>
+				<br><b>Possible values:</b> <code>500</code>
+				<br><b>Default value:</b> <code>1000</code>
 			</td>
 		</tr>
 		<tr>
@@ -71,12 +71,13 @@ The following properties can be configured:
 			</td>
 		</tr>
 		<tr>
-			<td><code>devices</code></td>
-			<td>List of configured devices.<br>Configure your device IDs to map to to a localized name. The library unfortunately cannot read out the room names, so you need to set them here manually. If no config is set here it will simply display the ID of the sensor (this can then be used to map it to a name).<br>
+			<td><code>rooms</code></td>
+			<td>List of configured rooms.<br>Configure your rooms with all device IDs and a localized name and sorting order. In case you do not know your device IDs check the console logs.<br>
 				<br><b>Possible values:</b> <code>[{
-	            	id: '158d020172841d',
-	            	name: 'Living Room'
-	            }]</code>
+		            	name: 'Living room',
+		            	sortOrder: 30,
+		            	devices : ['158d000171240d', '158d00026cddae']
+	            	}]</code>
 				<br><b>Default value:</b> <code>none</code>
 			</td>
 		</tr>

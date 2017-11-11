@@ -13,18 +13,26 @@ Module.register('MMM-xiaomi', {
 
   defaults: {
     gatewayIP: '192.168.0.1',
-    updateInterval: 5,
-    animationSpeed: 3000,
+    animationSpeed: 1000,
     graphicLayout: false
   },
 
+  roomData: {},
 
   // Override socket notification handler.
   socketNotificationReceived: function (notification, payload) {
-      if (notification === 'XIAOMI_DATA') {
-          Log.info('received XIAOMI_DATA');
-          this.render(payload);
+      if (notification === 'XIAOMI_INITDATA') {
+          Log.info('received XIAOMI_INITDATA');
+
+          this.createRooms(payload);
+          this.render();
           this.updateDom(this.config.animationSpeed);
+      }
+      if (notification === 'XIAOMI_CHANGEDATA') {
+        Log.info('recieved XIAOMI_CHANGEDATA');
+        this.updateRoomData(payload);
+        this.render();
+        this.updateDom(this.config.animationSpeed);
       }
   },
 
@@ -32,9 +40,9 @@ Module.register('MMM-xiaomi', {
     Log.info("Starting module: " + this.name);
     this.update();
     // refresh every x minutes
-    setInterval(
-      this.update.bind(this),
-      this.config.updateInterval * 60 * 1000);
+    //setInterval(
+    //  this.update.bind(this),
+    //  this.config.updateInterval * 60 * 1000);
   },
 
   update: function(){
@@ -71,24 +79,106 @@ Module.register('MMM-xiaomi', {
   html: {
     table: '<table class="xsmall">{0}</table>',
     // table: '<div style="border:1px solid white; width:1px; height:100%; position:absolute"/><table class="xsmall">{0}</table>',
-    col: '<td align="left" class="normal light small">{0}</td><td align="left" class="dimmed light xsmall">{1}°C</td><td align="left" class="dimmed light xsmall">{2}%</td><td align="left" class="fa fa-1 {3}"></td>',
+    col: '<td align="left" class="normal light small">{0}</td><td align="left" class="dimmed light xsmall">{1}°C</td><td align="left" class="dimmed light xsmall">{2}%</td><td align="center" class="fa fa-1 fa-refresh {3} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-star {4} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-power-off {5} xiaomi-icon"></td>',
     row: '<tr>{0}{1}</tr>',
-    room: '<li><div class="room xsmall">{0} : {1}°C - {2}%</div></li>',
+    room: '<li><div class="room-item xsmall">{0} : {1}°C - {2}%</div></li>',
     loading: '<div class="dimmed light xsmall">Connecting to Xiaomi gateway...</div>',
     gaugeCol: '<tr><td>{0}</td><td>{1}</td><td style="font-size:14px">{2}°C</td><td style="font-size:14px">{3}%</td></tr>',
     progressBar: '<progress value="{0}" max="30"></progress> {0}°C',
     newBar: '<div style="width:100px; height:10px;"><div style="width:{0}px; height:4px; background-color:white"></div><div style="width:{1}px; height:4px; margin-top:3px; background-color:white"></div></div>',
     legendDiv: '<div class="legend-temp"/><div class="legend-humid"/>',
-    roomDiv: '<div class="room">{1}<div class="room-title">{0}</div></div>',
-    barDiv: '<div class="room-bars"><div style="width:{0}%; height:10px; background-color:white"></div><div style="width:{1}%; height:10px; margin-top:3px; background-color:grey"></div></div>'
+    roomDiv: '<div class="room-item">{1}<div class="room-title">{0}</div></div>',
+    barDiv: '<div class="room-bars"><div style="width:{0}%; height:10px; background-color:white"></div><div style="width:{1}%; height:10px; margin-top:3px; background-color:grey"></div></div>',
+    
+    // roomDiv parameter: 0: room position (left/right), 1: room name, 2: temperature, 3: humidity, 4: door state, 5: light state, 6: vent state
+    roomDiv: '<div class="room {0} normal light small"><div class="room-header">{1}</div><div class="room-temp-humid"><div class="room-temp">{2}°C</div><div class="room-humid">{3}%</div></div><div class="room-icons"><div class="door-icon">{4}</div><div class="light-icon">{5}</div><div class="vent-icon">{6}</div></div></div>',
+    roomContainerDiv: '<div class="room-container">{0}</div>'
   },
 
 
-  setGaugeData: function(data) {
+  render: function() {
+    this.calculateVentilation();
 
+    if (this.config.graphicLayout) {
+      this.renderGrid(roomData);
+    }
+    else {
+      this.renderText(roomData);
+    }
   },
 
-  render: function(data) {
+  createRooms: function(data) {
+    roomData = {}
+
+    // Sort the rooms based on the sorting order
+    var rooms = [];
+    for (var item in this.config.rooms) {
+      rooms.push([this.config.rooms[item].sortOrder, this.config.rooms[item]]);
+    }
+    rooms.sort(function(a, b) {
+      return a[0] - b[0];
+    });
+
+
+    for (var a = 0; a < rooms.length; a++) {
+      var room = rooms[a][1];
+      var roomObject = {}
+      roomObject.name = room.name;
+      roomObject.sensors = []
+      roomObject.lights = []
+      roomObject.windows = []
+      for (var i = 0; i < room.devices.length; i++) {
+        // find device in sensor data
+        var find = $.grep(data, function(e){ return e.id == room.devices[i] });
+
+        if (find[0].type === 'sensor') {
+          roomObject.sensors[roomObject.sensors.length] = find[0];
+        }
+        else if (find[0].type === 'light') {
+          roomObject.lights[roomObject.lights.length] = find[0];
+        }
+        else if (find[0].type === 'magnet') {
+          roomObject.windows[roomObject.windows.length] = find[0];
+        }
+
+      }
+      roomData[room.name] = roomObject
+    }
+  },
+
+  updateRoomData: function(event) {
+    if (roomData != null) {
+    // Find the sensor from which the event occured
+      for (var key in roomData) {
+        var room = roomData[key];
+        
+        room.sensors.forEach(function (sensor) {
+          if (sensor.id === event.id) {
+            if (event.property === "temperature") {
+              sensor.temperature = event.value;
+            }
+            else if (event.property === "humidity") {
+              sensor.humidity = event.value;
+            }   
+          }
+        });
+
+        room.windows.forEach(function (window) {
+          if (window.id === event.id) {
+            window.open = event.value;
+          }
+        });
+
+        room.lights.forEach(function (light) {
+          if (light.id === event.id) {
+            light.power = event.value;
+          }
+        });
+      } 
+    }
+  },
+
+  calculateVentilation: function() {
 
     // Calculate some utility info first
     var outsideTemp;
@@ -99,37 +189,40 @@ Module.register('MMM-xiaomi', {
     // If we have an outside sensor we can calculate ventilation effects
     if (this.config.outsideSensorId != null) {
       // Find the outside sensor
-      data.forEach(function(sensor) {
-        if (sensor.id === self.config.outsideSensorId) {
-          outsideTemp = sensor.temperature
-          outsideHumid = sensor.humidity
-          
-          outsideAbsoluteHumid = self.calculateAbsoluteHumidity(sensor.temperature, sensor.humidity)
-        }
-      });
+      for (var key in roomData) {
+        var room = roomData[key];
+        room.sensors.forEach(function (sensor) {
+          if (sensor.id === self.config.outsideSensorId) {
+            outsideTemp = sensor.temperature
+            outsideHumid = sensor.humidity
+            
+            outsideAbsoluteHumid = self.calculateAbsoluteHumidity(sensor.temperature, sensor.humidity)
+          }          
+        });
+      }    
+    }
 
+    // Now calculate the ventialtion effect for each indoor room
+    for (var key in roomData) {
+      var room = roomData[key];
+      room.ventilatationUseful = false
 
-      // Now calculate the ventialtion effect for each indoor room
-      data.forEach(function(sensor) {
+      room.sensors.forEach(function (sensor) {
         if (outsideAbsoluteHumid != null) {
           sensor.absoluteHumidity = self.calculateAbsoluteHumidity(sensor.temperature, sensor.humidity)
-          if (sensor.absoluteHumidity > outsideAbsoluteHumid) {
-            sensor.ventilatationUseful = true
+          if (sensor.absoluteHumidity > outsideAbsoluteHumid && sensor.humidity > 60) {
+            room.ventilatationUseful = true
           }
         }
         else {
-          sensor.ventilatationUseful = true
+          // In case we don't have an outside sensor simply ventilate if we have over 60 % humidity
+          if (sensor.humidity > 60) {
+            room.ventilatationUseful = true
+          }          
         }
       });
     }
-
-    if (this.config.graphicLayout) {
-      this.renderProgress(data);
-    }
-    else {
-      this.renderText(data);
-    }
-
+    
   },
 
 
@@ -167,139 +260,61 @@ Module.register('MMM-xiaomi', {
 
   },
 
-  renderProgress: function(data) {
 
-    var text = ''
-    var textRow = ''
-    var maxTemp;
-    var minTemp;
+  renderGrid: function(data) {
+    var roomDivString = ""
+    $.each(data, function (i, room) {
 
-    // First calculate the min/max values to define the scale for temperatur
-    $.each(data, function (i, item) {
-        if (item.temperature > maxTemp) {
-          maxTemp = item.temperature
-        }
-        if (item.temperature < minTemp) {
-          minTemp = item.temperature
-        }
-    }.bind(this));
+      var colType = ((i+1) % 3 == 0) ? "right" : "left";
 
-    // Lets define the min-temp at -15°C and the max-temp at 40°C, so we have a span of 55° which
-    // is mapped to 100%. This means we need to add 15° to each temp and multiply with 100/55
-
-    text += this.html.legendDiv.format();
-
-    $.each(data, function (i, item) {
-        var room = {
-          id: item.id,
-          name: item.id,
-          temp: item.temperature,
-          humid: item.humidity
-        };
-
-        // Try to resolve ID from config
-        if (this.config.devices.find(x => x.id === room.id)) {
-          room.name = this.config.devices.find(x => x.id === room.id).name
-        }   
-
-        // Format temperatur and humidity by rounding
-        room.temp = Math.round(room.temp * 10) / 10
-        room.humid = Math.round(room.humid)
-
-        var tempValue = room.temp + 15 * (110/55);
-
-        //var textCol = this.html.newBar.format(tempValue, room.humid);
-        //textRow += this.html.gaugeCol.format(room.name, textCol, room.temp, room.humid);
-        var barDiv = this.html.barDiv.format(tempValue, room.humid);
-        text += this.html.roomDiv.format(room.name, barDiv);
+      roomDivString += this.html.roomDiv.format(colType, room.name, room.devices[0].temperature, room.devices[0].humidity, room.doorStatus, room.lightStatus, room.ventStatus);
 
       //text += this.renderRoom(room, mode, temp, valve, time_until, locked);
     }.bind(this));
 
-    //text = this.html.table.format(textRow);
+    var roomGridString = this.html.roomContainerDiv.format(roomDivString);
 
     this.loaded = true;
 
-
     // only update dom if content changed
-    if(this.dom !== text){
-      this.dom = text;
+    if(this.dom !== roomGridString){
+      this.dom = roomGridString;
       this.updateDom(this.config.animationSpeed);
     }
 
-  },
-
-  renderGauge: function(data) {
-      var previousCol =''
-      var rowCount = 0;
-      var tableText = ''
-      $.each(data, function (i, item) {
-
-        var currCol = this.html.gaugeCol.format(item.id);
-
-        if (i%2!=0 || !this.config.twoColLayout) {
-          // start new row
-          tableText += this.html.row.format(previousCol, currCol);
-          previousCol = '';
-          rowCount++;
-        }
-        else {
-          previousCol = currCol;
-        }
-
-        //text += this.renderRoom(room, mode, temp, valve, time_until, locked);
-      }.bind(this));
-
-      // Print last row if uneven
-      if (previousCol != '') {
-        tableText += this.html.row.format(previousCol, '');
-        previousCol = '';
-        rowCount++;
-      }
-
-      text = this.html.table.format(tableText);
-
-      this.loaded = true;
-
-      // only update dom if content changed
-      if(this.dom !== text){
-        this.dom = text;
-        this.updateDom(this.config.animationSpeed);
-      }
   },
 
   renderText: function(data){
       var previousCol =''
       var rowCount = 0;
       var tableText = ''
-      $.each(data, function (i, item) {
-        if (item != null) {
-          
-          var ventilate = false
-          if (item.humidity > 60 && item.ventilatationUseful) {
-            ventilate = true
+
+      $.each(data, function (i, room) {
+        if (room != null) {
+
+          var temp;
+          var humid;
+
+          // Get the temperature sensor from the device list
+          if (room.sensors.length > 0) {
+            // For now: just get the data from the first sensor
+            temp = room.sensors[0].temperature
+            humid = room.sensors[0].humidity
           }
 
-          var room = {
-            id: item.id,
-            name: item.id,
-            temp: item.temperature,
-            humid: item.humidity,
-            vent : ventilate
-          };
-
-          // Try to resolve ID from config
-          if (this.config.devices.find(x => x.id === room.id)) {
-            room.name = this.config.devices.find(x => x.id === room.id).name
-          }   
-
           // Format temperatur and humidity by rounding
-          room.temp = Math.round(room.temp * 10) / 10
-          room.humid = Math.round(room.humid)
+          temp = Math.round(temp * 10) / 10
+          humid = Math.round(humid)
 
-          var icon = room.vent ? "fa-refresh " : ""
+          var ventIcon = room.ventilatationUseful ? "" : "disabled";
 
-          var currCol = this.html.col.format(room.name, room.temp, room.humid, icon);
+          var windowOpen = $.grep(room.windows, function(window){ return window.open == true });
+          var windowIcon = (windowOpen.length > 0) ? "" : "disabled";
+
+          var lightsOn = $.grep(room.lights, function(light){ return light.power == true });
+          var lightsIcon = (lightsOn.length > 0) ? "" : "disabled";
+
+          var currCol = this.html.col.format(room.name, temp, humid, ventIcon, windowIcon, lightsIcon);
 
           if (i%2!=0 || !this.config.twoColLayout) {
             // start new row
