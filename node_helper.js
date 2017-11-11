@@ -11,17 +11,20 @@ const NodeHelper = require('node_helper');
 
 const miio = require('miio');
 
+var deviceList = {};
 
 module.exports = NodeHelper.create({
 
+
   start: function () {
     console.log("Starting xiaomi helper");
+    this.deviceList = {};
   },
 
   //Subclass socketNotificationReceived received.
   socketNotificationReceived: function(notification, payload) {
-    if (notification === 'XIAOMI_UPDATE') {
-      console.log("Triggering Xiaomi Gateway upate");
+    if (notification === 'XIAOMI_CONNECT') {
+      console.log(new Date() + ": Triggering Xiaomi Gateway connect");
       var self = this;
 
       if (payload.token == null || payload.token === "") {
@@ -49,12 +52,24 @@ module.exports = NodeHelper.create({
     var index = 0;
     var self = this;
 
+    gateway.on('unavailable', reg => {
+      if(! reg.device) return;
+      console.log(new Date() + ": Gateway unavailable");
+    });
+    gateway.on('error', reg => {
+      if(! reg.device) return;
+      console.log(new Date() + ": Gateway error");
+    });
+
     for (var i = 0; i < gateway.devices.length; i++) { 
       var currentDevice = gateway.devices[i]
       console.log("Found device with ID " + currentDevice.id  + " of type " + currentDevice.type)
 
-      // Register property change listener
-      currentDevice.on('propertyChanged', e => self.propertyChanged(e));
+      // Register property change listener (only if not already known)
+      if (!this.deviceList[currentDevice.id]) {
+        currentDevice.on('propertyChanged', e => self.propertyChanged(e));
+        this.deviceList[currentDevice.id] = currentDevice;
+      }
 
       // Handle different devices types
       if (currentDevice.type === 'sensor') {
@@ -84,8 +99,9 @@ module.exports = NodeHelper.create({
     this.sendSocketNotification('XIAOMI_INITDATA', sensors);
   },
 
+
   propertyChanged: function(event) {
-    console.log(event.id + " updated property '" + event.property + "' (" + event.oldValue + " --> " + event.value + ")");
+    console.log(new Date() + ": " + event.id + " updated property '" + event.property + "' (" + event.oldValue + " --> " + event.value + ")");
     this.sendSocketNotification('XIAOMI_CHANGEDATA', event);
   }
 });

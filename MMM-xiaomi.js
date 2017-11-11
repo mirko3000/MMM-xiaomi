@@ -14,7 +14,8 @@ Module.register('MMM-xiaomi', {
   defaults: {
     gatewayIP: '192.168.0.1',
     animationSpeed: 1000,
-    graphicLayout: false
+    graphicLayout: false,
+    updateInterval: 30
   },
 
   roomData: {},
@@ -39,15 +40,15 @@ Module.register('MMM-xiaomi', {
   start: function () {
     Log.info("Starting module: " + this.name);
     this.update();
-    // refresh every x minutes
-    //setInterval(
-    //  this.update.bind(this),
-    //  this.config.updateInterval * 60 * 1000);
+    // refresh every 30 minutes
+    setInterval(
+      this.update.bind(this),
+      this.config.updateInterval * 60 * 1000);
   },
 
   update: function(){
     this.sendSocketNotification(
-      'XIAOMI_UPDATE', {
+      'XIAOMI_CONNECT', {
           ip : this.config.gatewayIP, 
           token: this.config.gatewayToken
       });
@@ -100,15 +101,14 @@ Module.register('MMM-xiaomi', {
     this.calculateVentilation();
 
     if (this.config.graphicLayout) {
-      this.renderGrid(roomData);
+      this.renderGrid(this.roomData);
     }
     else {
-      this.renderText(roomData);
+      this.renderText(this.roomData);
     }
   },
 
   createRooms: function(data) {
-    roomData = {}
 
     // Sort the rooms based on the sorting order
     var rooms = [];
@@ -138,26 +138,56 @@ Module.register('MMM-xiaomi', {
           roomObject.lights[roomObject.lights.length] = find[0];
         }
         else if (find[0].type === 'magnet') {
+          // For the window sensore: on every reconnect the last status is lost. So restore the existing value here
+          if (this.roomData[room.name]) {
+            var oldSensor = $.grep(this.roomData[room.name].windows, function(e){ return e.id == find[0].id });
+            var oldOpenValue = oldSensor[0].open;
+            find[0].open = oldOpenValue;
+          }
+          
           roomObject.windows[roomObject.windows.length] = find[0];
         }
 
       }
-      roomData[room.name] = roomObject
+      this.roomData[room.name] = roomObject
     }
   },
 
   updateRoomData: function(event) {
-    if (roomData != null) {
+    if (this.roomData != null) {
     // Find the sensor from which the event occured
-      for (var key in roomData) {
-        var room = roomData[key];
+      for (var key in this.roomData) {
+        var room = this.roomData[key];
         
         room.sensors.forEach(function (sensor) {
           if (sensor.id === event.id) {
             if (event.property === "temperature") {
+              // Calculate trend
+              if (sensor.temperature > event.value) {
+                sensor.tempTrend = 'down';
+              }
+              else if (sensor.temperature < event.value) {
+                sensor.tempTrend = 'up';
+              }
+              else {
+                sensor.tempTrend = 'stable';
+              }
+
+              // Update temperature
               sensor.temperature = event.value;
             }
             else if (event.property === "humidity") {
+              // Calculate trend
+              if (sensor.humidity > event.value) {
+                sensor.tempTrend = 'down';
+              }
+              else if (sensor.humidity < event.value) {
+                sensor.tempTrend = 'up';
+              }
+              else {
+                sensor.humidTrend = 'stable';
+              }
+
               sensor.humidity = event.value;
             }   
           }
@@ -189,8 +219,8 @@ Module.register('MMM-xiaomi', {
     // If we have an outside sensor we can calculate ventilation effects
     if (this.config.outsideSensorId != null) {
       // Find the outside sensor
-      for (var key in roomData) {
-        var room = roomData[key];
+      for (var key in this.roomData) {
+        var room = this.roomData[key];
         room.sensors.forEach(function (sensor) {
           if (sensor.id === self.config.outsideSensorId) {
             outsideTemp = sensor.temperature
@@ -203,8 +233,8 @@ Module.register('MMM-xiaomi', {
     }
 
     // Now calculate the ventialtion effect for each indoor room
-    for (var key in roomData) {
-      var room = roomData[key];
+    for (var key in this.roomData) {
+      var room = this.roomData[key];
       room.ventilatationUseful = false
 
       room.sensors.forEach(function (sensor) {
