@@ -80,7 +80,7 @@ Module.register('MMM-xiaomi', {
   html: {
     table: '<table class="xsmall">{0}</table>',
     // table: '<div style="border:1px solid white; width:1px; height:100%; position:absolute"/><table class="xsmall">{0}</table>',
-    col: '<td align="left" class="normal light small">{0}</td><td align="left" class="dimmed light xsmall">{1}°C</td><td align="left" class="dimmed light xsmall">{2}%</td><td align="center" class="fa fa-1 fa-refresh {3} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-star {4} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-power-off {5} xiaomi-icon"></td>',
+    col: '<td align="left" class="normal light small">{0}</td><td align="left" class="fa fa-angle-{6}"></td><td align="left" class="dimmed light xsmall">{1}°C</td><td align="left" class="fa fa-angle-{7}"></td><td align="left" class="dimmed light xsmall">{2}%</td><td align="center" class="fa fa-1 fa-refresh {3} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-star {4} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-power-off {5} xiaomi-icon"></td>',
     row: '<tr>{0}{1}</tr>',
     room: '<li><div class="room-item xsmall">{0} : {1}°C - {2}%</div></li>',
     loading: '<div class="dimmed light xsmall">Connecting to Xiaomi gateway...</div>',
@@ -132,7 +132,10 @@ Module.register('MMM-xiaomi', {
         var find = $.grep(data, function(e){ return e.id == room.devices[i] });
 
         if (find[0].type === 'sensor') {
+          find[0].tempTrend = 'right';
+          find[0].humidTrend = 'right';
           roomObject.sensors[roomObject.sensors.length] = find[0];
+          
         }
         else if (find[0].type === 'light') {
           roomObject.lights[roomObject.lights.length] = find[0];
@@ -170,7 +173,7 @@ Module.register('MMM-xiaomi', {
                 sensor.tempTrend = 'up';
               }
               else {
-                sensor.tempTrend = 'stable';
+                sensor.tempTrend = 'right';
               }
 
               // Update temperature
@@ -179,13 +182,13 @@ Module.register('MMM-xiaomi', {
             else if (event.property === "humidity") {
               // Calculate trend
               if (sensor.humidity > event.value) {
-                sensor.tempTrend = 'down';
+                sensor.humidTrend = 'down';
               }
               else if (sensor.humidity < event.value) {
-                sensor.tempTrend = 'up';
+                sensor.humidTrend = 'up';
               }
               else {
-                sensor.humidTrend = 'stable';
+                sensor.humidTrend = 'right';
               }
 
               sensor.humidity = event.value;
@@ -324,12 +327,16 @@ Module.register('MMM-xiaomi', {
 
           var temp;
           var humid;
+          var tempTrend;
+          var humidTrend;
 
           // Get the temperature sensor from the device list
           if (room.sensors.length > 0) {
             // For now: just get the data from the first sensor
             temp = room.sensors[0].temperature
             humid = room.sensors[0].humidity
+            tempTrend = room.sensors[0].tempTrend
+            humidTrend = room.sensors[0].humidTrend
           }
 
           // Format temperatur and humidity by rounding
@@ -344,7 +351,8 @@ Module.register('MMM-xiaomi', {
           var lightsOn = $.grep(room.lights, function(light){ return light.power == true });
           var lightsIcon = (lightsOn.length > 0) ? "" : "disabled";
 
-          var currCol = this.html.col.format(room.name, temp, humid, ventIcon, windowIcon, lightsIcon);
+
+          var currCol = this.html.col.format(room.name, temp, humid, ventIcon, windowIcon, lightsIcon, tempTrend, humidTrend);
 
           if (i%2!=0 || !this.config.twoColLayout) {
             // start new row
