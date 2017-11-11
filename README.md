@@ -4,7 +4,7 @@ Additional Module for MagicMirror²  https://github.com/MichMich/MagicMirror/
 # Module: MMM-xiaomi
 This module displays data from your Xiaomi smart home sensors (temperature, humidity, window state, light state). It also calculates recommended ventilation for your indoor rooms in case the humidity exceed 60%. This requires an outside sensor to take into account the outside humidity and temperature.
 
-<blockquote class="imgur-embed-pub" lang="en" data-id="SMeQHuQ"><a href="//imgur.com/SMeQHuQ">View post on imgur.com</a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
+<a href="https://imgbb.com/"><img src="https://image.ibb.co/emVXHb/Bildschirmfoto_2017_11_11_um_13_25_37.png" alt="Bildschirmfoto_2017_11_11_um_13_25_37" border="0"></a>
 
 ## Installation
 
