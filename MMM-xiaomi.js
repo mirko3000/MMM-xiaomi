@@ -15,10 +15,12 @@ Module.register('MMM-xiaomi', {
     gatewayIP: '192.168.0.1',
     animationSpeed: 1000,
     graphicLayout: false,
-    updateInterval: 30
+    updateInterval: 30,
+    showHeating: false,
+    showWindow: false,
+    showVentilation: true,
+    showLights: false
   },
-
-  roomData: {},
 
   // Override socket notification handler.
   socketNotificationReceived: function (notification, payload) {
@@ -35,6 +37,15 @@ Module.register('MMM-xiaomi', {
         this.render();
         this.updateDom(this.config.animationSpeed);
       }
+  },
+
+    // Override socket notification handler.
+  notificationReceived: function (notification, payload) {
+      if (notification === 'MAX_HEATING_CHANGE') {
+        Log.info('recieved MAX_HEATING_CHANGE');
+        this.updateHeatingData(payload);
+      }
+
   },
 
   start: function () {
@@ -78,19 +89,20 @@ Module.register('MMM-xiaomi', {
 
 
   html: {
+    // For text layout
     table: '<table class="xsmall">{0}</table>',
-    // table: '<div style="border:1px solid white; width:1px; height:100%; position:absolute"/><table class="xsmall">{0}</table>',
-    col: '<td align="left" class="normal light small">{0}</td><td align="center" class="fa fa-angle-{6}"></td><td align="left" class="dimmed light xsmall">{1}°C</td><td align="center" class="fa fa-angle-{7}"></td><td align="left" class="dimmed light xsmall">{2}%</td><td align="center" class="fa fa-1 fa-refresh {3} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-star {4} xiaomi-icon"></td><td align="center" class="fa fa-1 fa-power-off {5} xiaomi-icon"></td>',
+    // Row parameters: 0: room name, 1: temperature, 2: humidity
+    col: '<td align="left" class="normal light small">{0}</td>',
+    colTemperature: '<td align="center" class="fa fa-angle-{1}"></td><td align="left" class="dimmed light xsmall">{0}°C</td>',
+    colHumidity: '<td align="center" class="fa fa-angle-{1}"></td><td align="left" class="dimmed light xsmall">{0}%</td>',
+    colVentilationIcon: '<td align="center" class="fa fa-1 fa-refresh {0} xiaomi-icon"></td>',
+    colWindowIcon: '<td align="center" class="fa fa-1 fa-star {0} xiaomi-icon"></td>',
+    colLightIcon: '<td align="center" class="fa fa-1 fa-power-off {0} xiaomi-icon"></td>',
+    colHeatingIcon: '<td align="center" class="fa fa-fire {0}">',
     row: '<tr>{0}{1}</tr>',
-    room: '<li><div class="room-item xsmall">{0} : {1}°C - {2}%</div></li>',
     loading: '<div class="dimmed light xsmall">Connecting to Xiaomi gateway...</div>',
-    gaugeCol: '<tr><td>{0}</td><td>{1}</td><td style="font-size:14px">{2}°C</td><td style="font-size:14px">{3}%</td></tr>',
-    progressBar: '<progress value="{0}" max="30"></progress> {0}°C',
-    newBar: '<div style="width:100px; height:10px;"><div style="width:{0}px; height:4px; background-color:white"></div><div style="width:{1}px; height:4px; margin-top:3px; background-color:white"></div></div>',
-    legendDiv: '<div class="legend-temp"/><div class="legend-humid"/>',
-    roomDiv: '<div class="room-item">{1}<div class="room-title">{0}</div></div>',
-    barDiv: '<div class="room-bars"><div style="width:{0}%; height:10px; background-color:white"></div><div style="width:{1}%; height:10px; margin-top:3px; background-color:grey"></div></div>',
     
+    // For grid layout
     // roomDiv parameter: 0: room position (left/right), 1: room name, 2: temperature, 3: humidity, 4: door state, 5: light state, 6: vent state
     roomDiv: '<div class="room {0} normal light small"><div class="room-header">{1}</div><div class="room-temp-humid"><div class="room-temp">{2}°C</div><div class="room-humid">{3}%</div></div><div class="room-icons"><div class="door-icon">{4}</div><div class="light-icon">{5}</div><div class="vent-icon">{6}</div></div></div>',
     roomContainerDiv: '<div class="room-container">{0}</div>'
@@ -108,107 +120,163 @@ Module.register('MMM-xiaomi', {
     }
   },
 
+
+  // Create an internal storage of the rooms
   createRooms: function(data) {
 
-    // Sort the rooms based on the sorting order
-    var rooms = [];
-    for (var item in this.config.rooms) {
-      rooms.push([this.config.rooms[item].sortOrder, this.config.rooms[item]]);
-    }
-    rooms.sort(function(a, b) {
-      return a[0] - b[0];
-    });
+    // If no room data exists, create new roomData set with initial values
+    if (!this.roomData) {
+      this.roomData = {};
 
-
-    for (var a = 0; a < rooms.length; a++) {
-      var room = rooms[a][1];
-      var roomObject = {}
-      roomObject.name = room.name;
-      roomObject.sensors = []
-      roomObject.lights = []
-      roomObject.windows = []
-      for (var i = 0; i < room.devices.length; i++) {
-        // find device in sensor data
-        var find = $.grep(data, function(e){ return e.id == room.devices[i] });
-
-        if (find[0].type === 'sensor') {
-          find[0].tempTrend = 'right';
-          find[0].humidTrend = 'right';
-          roomObject.sensors[roomObject.sensors.length] = find[0];
-          
-        }
-        else if (find[0].type === 'light') {
-          roomObject.lights[roomObject.lights.length] = find[0];
-        }
-        else if (find[0].type === 'magnet') {
-          // For the window sensore: on every reconnect the last status is lost. So restore the existing value here
-          if (this.roomData[room.name]) {
-            var oldSensor = $.grep(this.roomData[room.name].windows, function(e){ return e.id == find[0].id });
-            var oldOpenValue = oldSensor[0].open;
-            find[0].open = oldOpenValue;
-          }
-          
-          roomObject.windows[roomObject.windows.length] = find[0];
-        }
-
+      // Sort the rooms based on the sorting order
+      var rooms = [];
+      for (var item in this.config.rooms) {
+        rooms.push([this.config.rooms[item].sortOrder, this.config.rooms[item]]);
       }
-      this.roomData[room.name] = roomObject
+      rooms.sort(function(a, b) {
+        return a[0] - b[0];
+      });
+
+
+      // Now create each room object and add the list of sensors
+      for (var a = 0; a < rooms.length; a++) {
+        var room = rooms[a][1];
+        var roomObject = {}
+        roomObject.name = room.name;
+        roomObject.sensors = []
+        roomObject.lights = []
+        roomObject.windows = []
+        for (var i = 0; i < room.devices.length; i++) {
+          // find device in sensor data
+          var find = $.grep(data, function(e){ return e.id == room.devices[i] });
+
+          if (find[0].type === 'sensor') {
+            // Initialize trends with default
+            find[0].temperatureTrend = 'right';
+            find[0].humidityTrend = 'right';
+            // Add sensor to room 
+            roomObject.sensors[roomObject.sensors.length] = find[0];
+            
+          }
+          else if (find[0].type === 'light') {
+            // Add light to room list
+            roomObject.lights[roomObject.lights.length] = find[0];
+          }
+          else if (find[0].type === 'magnet') {
+            // Add magnet to room list
+            roomObject.windows[roomObject.windows.length] = find[0];
+          }
+
+        }
+        // Add room to room list
+        this.roomData[room.name] = roomObject
+      }
+
     }
   },
 
+
+  // Update data from the recieved event into the internal storage
   updateRoomData: function(event) {
     if (this.roomData != null) {
     // Find the sensor from which the event occured
       for (var key in this.roomData) {
         var room = this.roomData[key];
         
+        var self = this;
+
+        // Check temperature sensors
         room.sensors.forEach(function (sensor) {
           if (sensor.id === event.id) {
-            if (event.property === "temperature") {
-              // Calculate trend
-              if (sensor.temperature > event.value) {
-                sensor.tempTrend = 'down';
-              }
-              else if (sensor.temperature < event.value) {
-                sensor.tempTrend = 'up';
-              }
-              else {
-                sensor.tempTrend = 'right';
-              }
+            self.addHistoryAndCalculateTrend(sensor, event.property, event.value);
 
+            if (event.property === "temperature") {
               // Update temperature
               sensor.temperature = event.value;
             }
             else if (event.property === "humidity") {
-              // Calculate trend
-              if (sensor.humidity > event.value) {
-                sensor.humidTrend = 'down';
-              }
-              else if (sensor.humidity < event.value) {
-                sensor.humidTrend = 'up';
-              }
-              else {
-                sensor.humidTrend = 'right';
-              }
-
+              // Update humidity
               sensor.humidity = event.value;
             }   
+            return;
           }
         });
 
+        // Check window sensors
         room.windows.forEach(function (window) {
           if (window.id === event.id) {
             window.open = event.value;
+            return;
           }
         });
 
+        // Check lights
         room.lights.forEach(function (light) {
           if (light.id === event.id) {
             light.power = event.value;
+            return;
           }
         });
       } 
     }
+  },
+
+  updateHeatingData: function(payload) {
+    // We have recieved data from an heating system, update the status if heating is on or off per room
+    var room = payload.room;
+    var valve = payload.valve;
+
+    if (this.roomData) {
+      // Find a room with the same name
+      var roomObject = this.roomData[room];
+
+      if (roomObject) {
+        roomObject.heating = (valve > 0);
+      }      
+    } 
+
+  },
+
+  // Add current sensor value to history and calculate trend based on the last two values. Only
+  // if all values are in the same direction a trend is identified.
+  addHistoryAndCalculateTrend: function(sensor, property, newValue) {
+
+    if (!sensor.history) {
+      // Create new history
+      sensor.history = {};
+    }
+
+    // Get the history of the current property, create if it does not exist
+    if (!sensor.history[property]) {
+      sensor.history[property] = [];
+    }
+
+    var history = sensor.history[property];
+
+    // Calculate trend only if we have at least 3 history entries
+    if (history.length >= 2) {
+      // Check the last 3 entries for a consistent trend
+      var currentValue = Math.round(sensor[property] * 10) / 10;
+      var history1 = Math.round(history[history.length-1].value * 10) / 10;
+      var history2= Math.round(history[history.length-2].value * 10) / 10;
+      //var history3= history[history.length-2];
+
+      if (history1 > history2 && currentValue > history1) {
+        // upwards trend
+        sensor[property + "Trend"] = 'up';
+      }
+      else if (history1 < history2 && currentValue < history1) {
+        // downwards trend
+        sensor[property + "Trend"] = 'down';
+      }
+      else {
+        // equal trend
+        sensor[property + "Trend"] = 'right';
+      }
+    }
+
+    // Store new value
+    history[history.length] = {date: new Date(), value: newValue};
   },
 
   calculateVentilation: function() {
@@ -327,32 +395,51 @@ Module.register('MMM-xiaomi', {
 
           var temp;
           var humid;
-          var tempTrend;
-          var humidTrend;
+          var temperatureTrend;
+          var humidityTrend;
 
           // Get the temperature sensor from the device list
           if (room.sensors.length > 0) {
             // For now: just get the data from the first sensor
             temp = room.sensors[0].temperature
             humid = room.sensors[0].humidity
-            tempTrend = room.sensors[0].tempTrend
-            humidTrend = room.sensors[0].humidTrend
+            temperatureTrend = room.sensors[0].temperatureTrend
+            humidityTrend = room.sensors[0].humidityTrend
           }
 
           // Format temperatur and humidity by rounding
           temp = Math.round(temp * 10) / 10
           humid = Math.round(humid)
 
-          var ventIcon = room.ventilatationUseful ? "" : "disabled";
-
-          var windowOpen = $.grep(room.windows, function(window){ return window.open == true });
-          var windowIcon = (windowOpen.length > 0) ? "" : "disabled";
-
-          var lightsOn = $.grep(room.lights, function(light){ return light.power == true });
-          var lightsIcon = (lightsOn.length > 0) ? "" : "disabled";
+          // Fist the basic column date (room name, temperature and humidity)
+          var currCol = this.html.col.format(room.name, temp, humid);
+          currCol += this.html.colTemperature.format(temp, temperatureTrend);
+          currCol += this.html.colHumidity.format(humid, humidityTrend);
 
 
-          var currCol = this.html.col.format(room.name, temp, humid, ventIcon, windowIcon, lightsIcon, tempTrend, humidTrend);
+          if (this.config.showVentilation) {
+            var ventIcon = room.ventilatationUseful ? "" : "disabled";
+            currCol += this.html.colVentilationIcon.format(ventIcon);
+          }
+
+          if (this.config.showWindow) {
+            var windowOpen = $.grep(room.windows, function(window){ return window.open == true });
+            var windowIcon = (windowOpen.length > 0) ? "" : "disabled";
+
+            currCol += this.html.colWindowIcon.format(windowIcon);
+          }
+
+          if (this.config.showLights) {
+            var lightsOn = $.grep(room.lights, function(light){ return light.power == true });
+            var lightsIcon = (lightsOn.length > 0) ? "" : "disabled";
+
+            currCol += this.html.colLightIcon.format(lightsIcon);
+          }
+
+          if (this.config.showHeating) {
+            var heatingIcon = room.heating ? "" : "disabled"; 
+            currCol += this.html.colHeatingIcon.format(heatingIcon);
+          }
 
           if (i%2!=0 || !this.config.twoColLayout) {
             // start new row
