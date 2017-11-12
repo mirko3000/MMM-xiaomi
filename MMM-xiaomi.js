@@ -193,10 +193,32 @@ Module.register('MMM-xiaomi', {
             if (event.property === "temperature") {
               // Update temperature
               sensor.temperature = event.value;
+
+              // Check for alerts
+              if (sensor.id != self.config.outsideSensorId && sensor.temperature < 17) {
+                //Show alert on UI
+                self.sendNotification("SHOW_ALERT", {
+                  title: "Critical temperature",
+                  message: "<span>Temperature in room " + room.name + " below 17°C<span>",
+                  imageFA: "thermometer-1"
+                });
+                setTimeout(function(){ self.sendNotification("HIDE_ALERT"); }, 10000); 
+              }
             }
             else if (event.property === "humidity") {
               // Update humidity
               sensor.humidity = event.value;
+
+              // Check for alerts
+              if (sensor.id != self.config.outsideSensorId && sensor.humidity >= 68) {
+                //Show alert on UI
+                self.sendNotification("SHOW_ALERT", {
+                  title: "Critical humidity",
+                  message: "<span>Humidity in room " + room.name + " above 68%<span>",
+                  imageFA: "thermometer-1"
+                });
+                setTimeout(function(){ self.sendNotification("HIDE_ALERT"); }, 10000); 
+              }
             }   
             return;
           }
@@ -220,6 +242,7 @@ Module.register('MMM-xiaomi', {
       } 
     }
   },
+
 
   updateHeatingData: function(payload) {
     // We have recieved data from an heating system, update the status if heating is on or off per room
@@ -253,30 +276,49 @@ Module.register('MMM-xiaomi', {
 
     var history = sensor.history[property];
 
-    // Calculate trend only if we have at least 3 history entries
-    if (history.length >= 2) {
+    // Calculate trend only if we have at least 1 history entries
+    if (history.length >= 1) {
       // Check the last 3 entries for a consistent trend
-      var currentValue = Math.round(sensor[property] * 10) / 10;
-      var history1 = Math.round(history[history.length-1].value * 10) / 10;
-      var history2= Math.round(history[history.length-2].value * 10) / 10;
-      //var history3= history[history.length-2];
+      var currentValue = sensor[property];
+      var history1 = history[history.length-1].value;
+      //var history2= history[history.length-2].value;
 
-      if (history1 > history2 && currentValue > history1) {
-        // upwards trend
+      // Only consider values if they are at least 30 seconds later
+      var currentDate = new Date();
+      // Calculate the timespan between now and the last recorded value (in minutes)
+      var timeDelta = (currentDate - history[history.length-1].date) / 1000 / 60;
+      var delta = history1 - currentValue;
+      var deltaPerMinute = delta / timeDelta;
+
+      console.log("Trend: " + currentValue + "(" + currentDate + ") - " + history1 + "(" + history[history.length-1].date + ")");
+      console.log("Delta: " + delta + " - DeltaPerMinute: " + deltaPerMinute);
+
+      if (delta > 0.5 || deltaPerMinute > 0.1) {
+        console.log("Trend up");
         sensor[property + "Trend"] = 'up';
       }
-      else if (history1 < history2 && currentValue < history1) {
+      else if (delta < 0.5  || deltaPerMinute < 0.1) {
         // downwards trend
+        console.log("Trend down");
         sensor[property + "Trend"] = 'down';
       }
       else {
         // equal trend
+        console.log("Trend equal");
         sensor[property + "Trend"] = 'right';
       }
     }
 
     // Store new value
     history[history.length] = {date: new Date(), value: newValue};
+
+    // Cleanup history, keep oldest 2 entries
+    if (history.length > 20) {
+      var newHistory = [];
+      newHistory[0] = history[history.length-1];
+      newHistory[1] = history[history.length-2];
+      history = newHistory;
+    }
   },
 
   calculateVentilation: function() {
