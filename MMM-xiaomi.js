@@ -289,17 +289,17 @@ Module.register('MMM-xiaomi', {
       var currentDate = new Date();
       // Calculate the timespan between now and the last recorded value (in minutes)
       var timeDelta = (currentDate - history[history.length-1].date) / 1000 / 60;
-      var delta = history1 - currentValue;
+      var delta = currentValue - history1;
       var deltaPerMinute = delta / timeDelta;
 
       console.log("Trend: " + currentValue + "(" + currentDate + ") - " + history1 + "(" + history[history.length-1].date + ")");
       console.log("Delta: " + delta + " - DeltaPerMinute: " + deltaPerMinute);
 
-      if (delta > 0.5 || deltaPerMinute > 0.1) {
+      if (delta > 0.5 || deltaPerMinute > 0.05) {
         console.log("Trend up");
         sensor[property + "Trend"] = 'up';
       }
-      else if (delta < 0.5  || deltaPerMinute < 0.1) {
+      else if (delta < 0.5  || deltaPerMinute < 0.05) {
         // downwards trend
         console.log("Trend down");
         sensor[property + "Trend"] = 'down';
