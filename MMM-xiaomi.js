@@ -30,9 +30,6 @@ Module.register('MMM-xiaomi', {
           this.createRooms(payload);
           this.render();
           this.updateDom(this.config.animationSpeed);
-
-          //this.sendNotification('PLAY_SOUND', 'wobble.wav');
-          this.sendSocketNotification("PLAY_SOUND", "old-phone-ringing.wav");
       }
       if (notification === 'XIAOMI_CHANGEDATA') {
         Log.info('recieved XIAOMI_CHANGEDATA');
@@ -207,7 +204,10 @@ Module.register('MMM-xiaomi', {
                   message: "<span>Temperature in room " + room.name + " below 17°C<span>",
                   imageFA: "thermometer-1"
                 });
-                setTimeout(function(){ self.sendNotification("HIDE_ALERT"); }, 10000); 
+                setTimeout(function(){ 
+                  self.sendNotification("HIDE_ALERT"); 
+                  this.sendSocketNotification("PLAY_SOUND", "bell.wav");
+                }, 10000); 
               }
             }
             else if (event.property === "humidity") {
@@ -222,7 +222,10 @@ Module.register('MMM-xiaomi', {
                   message: "<span>Humidity in room " + room.name + " above 68%<span>",
                   imageFA: "thermometer-1"
                 });
-                setTimeout(function(){ self.sendNotification("HIDE_ALERT"); }, 10000); 
+                setTimeout(function(){ 
+                  self.sendNotification("HIDE_ALERT"); 
+                  this.sendSocketNotification("PLAY_SOUND", "bell.wav");
+                }, 10000); 
               }
             }   
             return;
