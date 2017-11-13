@@ -6,6 +6,8 @@ This module displays data from your Xiaomi smart home sensors (temperature, humi
 
 <a href="https://imgbb.com/"><img src="https://image.ibb.co/emVXHb/Bildschirmfoto_2017_11_11_um_13_25_37.png" alt="Bildschirmfoto_2017_11_11_um_13_25_37" border="0"></a>
 
+If you use the MAX! heating system you can install my other module MMM-max and include heating indication in this module as well.
+
 ## Installation
 
 1. Navigate into your MagicMirror's modules folder and execute <code>git clone https://github.com/mirko3000/MMM-xiaomi</code>.git. A new folder will appear, navigate into it.
@@ -68,6 +70,34 @@ The following properties can be configured:
 			<td>In case you have an sensor outside you can provide the ID here. This is used to calculate ventilation effects.<br>
 				<br><b>Possible values:</b> <code>158d020172841d</code>
 				<br><b>Default value:</b> <code>none</code>
+			</td>
+		</tr>
+		<tr>
+			<td><code>showVentilation</code></td>
+			<td>Shows an icon in case ventilation is recommended<br>
+				<br><b>Possible values:</b> <code>true</code>
+				<br><b>Default value:</b> <code>false</code>
+			</td>
+		</tr>
+		<tr>
+			<td><code>showWindow</code></td>
+			<td>Shows an icon for the open state of the door/window sensors.<br>
+				<br><b>Possible values:</b> <code>true</code>
+				<br><b>Default value:</b> <code>false</code>
+			</td>
+		</tr>
+		<tr>
+			<td><code>showLights</code></td>
+			<td>Shows an icon for the state of lights in the room.<br>
+				<br><b>Possible values:</b> <code>true</code>
+				<br><b>Default value:</b> <code>false</code>
+			</td>
+		</tr>
+		<tr>
+			<td><code>showHeating</code></td>
+			<td>Shows an icon for the heating state of the MAX! system.<br>
+				<br><b>Possible values:</b> <code>true</code>
+				<br><b>Default value:</b> <code>false</code>
 			</td>
 		</tr>
 		<tr>
