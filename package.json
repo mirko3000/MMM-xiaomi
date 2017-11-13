@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/mirko3000/MMM-xiaomi#readme",
   "dependencies": {
-    "miio": "https://github.com/mirko3000/miio.git"
+    "miio": "https://github.com/mirko3000/miio.git",
+    "node-aplay": "^1.0.3"
   }
 }

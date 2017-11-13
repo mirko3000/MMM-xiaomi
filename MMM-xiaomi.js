@@ -30,6 +30,9 @@ Module.register('MMM-xiaomi', {
           this.createRooms(payload);
           this.render();
           this.updateDom(this.config.animationSpeed);
+
+          //this.sendNotification('PLAY_SOUND', 'wobble.wav');
+          this.sendSocketNotification("PLAY_SOUND", "buzz.wav");
       }
       if (notification === 'XIAOMI_CHANGEDATA') {
         Log.info('recieved XIAOMI_CHANGEDATA');

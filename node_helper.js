@@ -8,6 +8,9 @@
  */
 
 const NodeHelper = require('node_helper');
+const Player     = require('node-aplay');
+const fs         = require('fs');
+const path       = require('path');
 
 const miio = require('miio');
 
@@ -44,6 +47,9 @@ module.exports = NodeHelper.create({
           .catch(console.error);
         }
 
+    }
+    if (notification === 'PLAY_SOUND') {
+      this.playFile(payload, 500);
     }
   },
   getDevices: function(gateway) {
@@ -103,5 +109,30 @@ module.exports = NodeHelper.create({
   propertyChanged: function(event) {
     console.log(new Date() + ": " + event.id + " updated property '" + event.property + "' (" + event.oldValue + " --> " + event.value + ")");
     this.sendSocketNotification('XIAOMI_CHANGEDATA', event);
-  }
+  },
+
+  /**
+   * @param {String}  filename
+   * @param {Number} [delay]  in ms
+   */
+  playFile: function (filename, delay) {
+
+    let soundfile = __dirname + '/sounds/' + filename;
+
+    // Make sure file exists before playing
+    try {
+      fs.accessSync(soundfile, fs.F_OK);
+    } catch (e) {
+      // Custom sequence doesn't exist
+      console.log('Sound does not exist: ' + soundfile);
+      return;
+    }
+
+    console.log('Playing ' + filename + ' with ' + delay + 'ms delay', true);
+
+    setTimeout(() => {
+      new Player(path.normalize(__dirname + '/sounds/' + filename)).play();
+    }, delay);
+      
+    },
 });
