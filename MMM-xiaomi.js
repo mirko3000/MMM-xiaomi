@@ -150,23 +150,25 @@ Module.register('MMM-xiaomi', {
           // find device in sensor data
           var find = $.grep(data, function(e){ return e.id == room.devices[i] });
 
-          if (find[0].type === 'sensor') {
-            // Initialize trends with default
-            find[0].temperatureTrend = 'right';
-            find[0].humidityTrend = 'right';
-            // Add sensor to room 
-            roomObject.sensors[roomObject.sensors.length] = find[0];
-            
-          }
-          else if (find[0].type === 'light') {
-            // Add light to room list
-            roomObject.lights[roomObject.lights.length] = find[0];
-          }
-          else if (find[0].type === 'magnet') {
-            // Add magnet to room list
-            roomObject.windows[roomObject.windows.length] = find[0];
-          }
+          if (find.length > 0) {
 
+            if (find[0].type === 'sensor') {
+              // Initialize trends with default
+              find[0].temperatureTrend = 'right';
+              find[0].humidityTrend = 'right';
+              // Add sensor to room 
+              roomObject.sensors[roomObject.sensors.length] = find[0];
+              
+            }
+            else if (find[0].type === 'light') {
+              // Add light to room list
+              roomObject.lights[roomObject.lights.length] = find[0];
+            }
+            else if (find[0].type === 'magnet') {
+              // Add magnet to room list
+              roomObject.windows[roomObject.windows.length] = find[0];
+            }
+          }
         }
         // Add room to room list
         this.roomData[room.name] = roomObject
