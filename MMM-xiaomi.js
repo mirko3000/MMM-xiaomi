@@ -32,7 +32,7 @@ Module.register('MMM-xiaomi', {
           this.updateDom(this.config.animationSpeed);
 
           //this.sendNotification('PLAY_SOUND', 'wobble.wav');
-          this.sendSocketNotification("PLAY_SOUND", "buzz.wav");
+          this.sendSocketNotification("PLAY_SOUND", "old-phone-ringing.wav");
       }
       if (notification === 'XIAOMI_CHANGEDATA') {
         Log.info('recieved XIAOMI_CHANGEDATA');
