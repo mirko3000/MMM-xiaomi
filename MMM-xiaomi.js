@@ -287,7 +287,6 @@ Module.register('MMM-xiaomi', {
     // Calculate trend only if we have at least 1 history entries
     if (history.length >= 1) {
       // Check the last 3 entries for a consistent trend
-      var currentValue = sensor[property];
       var history1 = history[history.length-1].value;
       //var history2= history[history.length-2].value;
 
@@ -295,24 +294,34 @@ Module.register('MMM-xiaomi', {
       var currentDate = new Date();
       // Calculate the timespan between now and the last recorded value (in minutes)
       var timeDelta = (currentDate - history[history.length-1].date) / 1000 / 60;
-      var delta = currentValue - history1;
+      var delta = newValue - history1;
       var deltaPerMinute = delta / timeDelta;
 
-      console.log("Trend: " + currentValue + "(" + currentDate + ") - " + history1 + "(" + history[history.length-1].date + ")");
-      console.log("Delta: " + delta + " - DeltaPerMinute: " + deltaPerMinute);
+      // console.log("Trend: " + newValue + "(" + currentDate.toLocaleTimeString() + ") - " + history1 + "(" + history[history.length-1].date.toLocaleTimeString() + ")");
+      // console.log("Delta: " + delta + " - DeltaPerMinute: " + deltaPerMinute);
 
-      if (delta > 0.5 || deltaPerMinute > 0.05) {
-        console.log("Trend up");
+      // maximum deltas for temperature
+      var maxDelta = 0.5
+      var maxDeltaPerMinute = 0.05
+
+      // maximum deltas for humidity
+      if (property === "humidity") {
+        maxDelta = 2
+        maxDeltaPerMinute = 0.2
+      }
+
+      if (delta > maxDelta || deltaPerMinute > maxDeltaPerMinute) {
+        // console.log("Trend up");
         sensor[property + "Trend"] = 'up';
       }
-      else if (delta < 0.5  || deltaPerMinute < 0.05) {
+      else if (delta < (maxDelta * -1)  || deltaPerMinute < (maxDeltaPerMinute * -1)) {
         // downwards trend
-        console.log("Trend down");
+        // console.log("Trend down");
         sensor[property + "Trend"] = 'down';
       }
       else {
         // equal trend
-        console.log("Trend equal");
+        // console.log("Trend equal");
         sensor[property + "Trend"] = 'right';
       }
     }

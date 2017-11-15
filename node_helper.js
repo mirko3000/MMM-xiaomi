@@ -107,7 +107,7 @@ module.exports = NodeHelper.create({
 
 
   propertyChanged: function(event) {
-    console.log(new Date() + ": " + event.id + " updated property '" + event.property + "' (" + event.oldValue + " --> " + event.value + ")");
+    // console.log(new Date() + ": " + event.id + " updated property '" + event.property + "' (" + event.oldValue + " --> " + event.value + ")");
     this.sendSocketNotification('XIAOMI_CHANGEDATA', event);
   },
 
