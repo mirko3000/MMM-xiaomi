@@ -204,9 +204,11 @@ Module.register('MMM-xiaomi', {
                   message: "<span>Temperature in room " + room.name + " below 17°C<span>",
                   imageFA: "thermometer-1"
                 });
+                self.sendSocketNotification("PLAY_SOUND", "bell.wav");
+                // Hide notification after 10 seconds
                 setTimeout(function(){ 
                   self.sendNotification("HIDE_ALERT"); 
-                  this.sendSocketNotification("PLAY_SOUND", "bell.wav");
+                  
                 }, 10000); 
               }
             }
@@ -222,9 +224,10 @@ Module.register('MMM-xiaomi', {
                   message: "<span>Humidity in room " + room.name + " above 68%<span>",
                   imageFA: "thermometer-1"
                 });
+                self.sendSocketNotification("PLAY_SOUND", "bell.wav");
+                // Hide notification after 10 seconds
                 setTimeout(function(){ 
                   self.sendNotification("HIDE_ALERT"); 
-                  this.sendSocketNotification("PLAY_SOUND", "bell.wav");
                 }, 10000); 
               }
             }   
