@@ -6,6 +6,12 @@ This module displays data from your Xiaomi smart home sensors (temperature, humi
 
 <a href="https://imgbb.com/"><img src="https://image.ibb.co/emVXHb/Bildschirmfoto_2017_11_11_um_13_25_37.png" alt="Bildschirmfoto_2017_11_11_um_13_25_37" border="0"></a>
 
+Iconography:
+- A refresh icon indicates that ventilation is recommended (above 60% humidity)
+- A star icon indicates that a window/door is currently open in the room
+- A power icon indicates that a light is currently switched on
+- A fire icon indicates that heating is active
+
 If you use the MAX! heating system you can install my other module MMM-max and include heating indication in this module as well.
 
 ## Installation
@@ -56,6 +62,7 @@ The following properties can be configured:
 			<td>The optional authentification token for your gateway in case your device does not allow direct access.<br>
 				<br><b>Possible values:</b> <code>cfbdb215c0824fcc971917e36822fcbe</code>
 				<br><b>Default value:</b> <code>none</code>
+				This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -63,6 +70,7 @@ The following properties can be configured:
 			<td>The animation speed on refreshing data.<br>
 				<br><b>Possible values:</b> <code>500</code>
 				<br><b>Default value:</b> <code>1000</code>
+				This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -70,6 +78,7 @@ The following properties can be configured:
 			<td>In case you have an sensor outside you can provide the ID here. This is used to calculate ventilation effects.<br>
 				<br><b>Possible values:</b> <code>158d020172841d</code>
 				<br><b>Default value:</b> <code>none</code>
+				This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -77,6 +86,7 @@ The following properties can be configured:
 			<td>Shows an icon in case ventilation is recommended<br>
 				<br><b>Possible values:</b> <code>true</code>
 				<br><b>Default value:</b> <code>false</code>
+				This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -84,6 +94,7 @@ The following properties can be configured:
 			<td>Shows an icon for the open state of the door/window sensors.<br>
 				<br><b>Possible values:</b> <code>true</code>
 				<br><b>Default value:</b> <code>false</code>
+				This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -91,6 +102,7 @@ The following properties can be configured:
 			<td>Shows an icon for the state of lights in the room.<br>
 				<br><b>Possible values:</b> <code>true</code>
 				<br><b>Default value:</b> <code>false</code>
+				This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -98,6 +110,7 @@ The following properties can be configured:
 			<td>Shows an icon for the heating state of the MAX! system.<br>
 				<br><b>Possible values:</b> <code>true</code>
 				<br><b>Default value:</b> <code>false</code>
+				This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -109,6 +122,7 @@ The following properties can be configured:
 		            	devices : ['158d000171240d', '158d00026cddae']
 	            	}]</code>
 				<br><b>Default value:</b> <code>none</code>
+				At least one room has to be defined in order for this module to work properly.
 			</td>
 		</tr>
 	</tbody>
