@@ -1,4 +1,4 @@
-# MMM-xiamo
+# MMM-xiaomi
 Additional Module for MagicMirror²  https://github.com/MichMich/MagicMirror/
 
 # Module: MMM-xiaomi
