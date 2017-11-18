@@ -114,6 +114,30 @@ The following properties can be configured:
 			</td>
 		</tr>
 		<tr>
+			<td><code>audioNotifications</code></td>
+			<td>Wether to enable audio notifications on temperature and humidity alarms. You need a MM with speakers or audio device connected. See https://www.raspberrypi.org/documentation/configuration/audio-config.md for help on setting up audio on a raspberry.<br>
+				<br><b>Possible values:</b> <code>true</code>
+				<br><b>Default value:</b> <code>false</code>
+				This value is optional.
+			</td>
+		</tr>
+		<tr>
+			<td><code>minTemperature</code></td>
+			<td>Minimum temperature for indoor rooms. In case temperature drops below this value a notification is displayed (optionally also audio notification).<br>
+				<br><b>Possible values:</b> <code>18</code>
+				<br><b>Default value:</b> <code>17</code>
+				This value is optional.
+			</td>
+		</tr>
+		<tr>
+			<td><code>maxHumidity</code></td>
+			<td>Maximum humidity for indoor rooms. In case humidity exceeds this value a notification is displayed (optionally also audio notification).<br>
+				<br><b>Possible values:</b> <code>70</code>
+				<br><b>Default value:</b> <code>68</code>
+				This value is optional.
+			</td>
+		</tr>
+		<tr>
 			<td><code>rooms</code></td>
 			<td>List of configured rooms.<br>Configure your rooms with all device IDs and a localized name and sorting order. In case you do not know your device IDs check the console logs.<br>
 				<br><b>Possible values:</b> <code>[{

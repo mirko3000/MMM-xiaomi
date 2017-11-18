@@ -19,7 +19,10 @@ Module.register('MMM-xiaomi', {
     showHeating: false,
     showWindow: false,
     showVentilation: true,
-    showLights: false
+    showLights: false,
+    audioNotifications: false,
+    minTemperature: 17,
+    maxHumidity: 68
   },
 
   // Override socket notification handler.
@@ -197,11 +200,11 @@ Module.register('MMM-xiaomi', {
               sensor.temperature = event.value;
 
               // Check for alerts
-              if (sensor.id != self.config.outsideSensorId && sensor.temperature < 17) {
+              if (sensor.id != self.config.outsideSensorId && sensor.temperature < self.config.minTemperature) {
                 //Show alert on UI
                 self.sendNotification("SHOW_ALERT", {
                   title: "Critical temperature",
-                  message: "<span>Temperature in room " + room.name + " below 17°C<span>",
+                  message: "<span>Temperature in room " + room.name + " below " + self.config.minTemperature + "°C<span>",
                   imageFA: "thermometer-1"
                 });
                 self.sendSocketNotification("PLAY_SOUND", "bell.wav");
@@ -217,11 +220,11 @@ Module.register('MMM-xiaomi', {
               sensor.humidity = event.value;
 
               // Check for alerts
-              if (sensor.id != self.config.outsideSensorId && sensor.humidity >= 68) {
+              if (sensor.id != self.config.outsideSensorId && sensor.humidity >= self.config.maxHumidity) {
                 //Show alert on UI
                 self.sendNotification("SHOW_ALERT", {
                   title: "Critical humidity",
-                  message: "<span>Humidity in room " + room.name + " above 68%<span>",
+                  message: "<span>Humidity in room " + room.name + " above " + self.config.maxHumidity + "%<span>",
                   imageFA: "thermometer-1"
                 });
                 self.sendSocketNotification("PLAY_SOUND", "bell.wav");
