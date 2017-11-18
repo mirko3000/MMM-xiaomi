@@ -140,18 +140,80 @@ The following properties can be configured:
 		</tr>
 		<tr>
 			<td><code>rooms</code></td>
-			<td>List of configured rooms.<br>Configure your rooms with all device IDs and a localized name and sorting order. In case you do not know your device IDs check the console logs.<br>
-				<br><b>Possible values:</b> <code>[{
-		            	name: 'Living room',
-		            	sortOrder: 30,
-		            	devices : ['158d000171240d', '158d00026cddae']
-	            	}]</code>
-				<br><b>Default value:</b> <code>none</code>
-				<br>At least one room has to be defined in order for this module to work properly.
+			<td>List of configured rooms.
+				<br>See "Room configuration options" options below.
 			</td>
 		</tr>
 	</tbody>
 </table>
+
+## Room configuration options
+
+<table width="100%">
+	<!-- why, markdown... -->
+	<thead>
+		<tr>
+			<th>Option</th>
+			<th width="100%">Description</th>
+		</tr>
+	<thead>
+	<tbody>
+		<tr>
+			<td><code>name</code></td>
+			<td>The name of your room<br>
+				<br><b>Possible values:</b> <code>Living room</code>
+				<br><b>Default value:</b> <code>none</code>
+			</td>
+		</tr>
+		<tr>
+			<td><code>sortOrder</code></td>
+			<td>The sorting order for your room. Lower numbers will be sorted above higher numbers.<br>
+				<br><b>Possible values:</b> <code>20</code>
+				<br><b>Default value:</b> <code>none</code>
+			</td>
+		</tr>
+		<tr>
+			<td><code>devices</code></td>
+			<td>A list of device IDs within your room. This can be all kind of (supported) devices, like temperature, door/window sensors or yeelights.<br>
+				<br><b>Possible values:</b> <code>['158d000171240d', '158d00026cddae']</code>
+				<br><b>Default value:</b> <code>none</code>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+Example:
+````javascript
+modules: [
+    {
+		module: 'MMM-xiaomi',
+		position: 'bottom_left',
+		header: 'Temperature / Humidity',  // This is optional
+		config: {
+			gatewayIP: '192.168.0.1',
+			outsideSensorId: '158d0001618421',
+			showWindow: true,
+	        showVentilation: true,
+	        showLights: false,
+	        audioNotifications: true,
+	        rooms:  [
+	            	{
+		            	name: 'Living room',
+		            	sortOrder: 10,
+		            	devices : ['158d000171840d', '158d00016ccdae']
+	            	},
+	            	{
+		            	name: 'Bedroom',
+		            	sortOrder: 20,
+		            	devices : ['158d0001635ac2']
+	            	},
+	        ]
+		}
+	},
+
+]
+````
+
 
 ## Authentification
 
