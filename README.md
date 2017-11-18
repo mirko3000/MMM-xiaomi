@@ -56,13 +56,14 @@ The following properties can be configured:
 				<br><b>Possible values:</b> <code>192.168.1.100</code>
 				<br><b>Default value:</b> <code>192.168.0.1</code>
 			</td>
+			<br>This value is <bold>mandatory</bold>
 		</tr>
 		<tr>
 			<td><code>gatewayToken</code></td>
 			<td>The optional authentification token for your gateway in case your device does not allow direct access.<br>
 				<br><b>Possible values:</b> <code>cfbdb215c0824fcc971917e36822fcbe</code>
 				<br><b>Default value:</b> <code>none</code>
-				This value is optional.
+				<br>This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -70,7 +71,7 @@ The following properties can be configured:
 			<td>The animation speed on refreshing data.<br>
 				<br><b>Possible values:</b> <code>500</code>
 				<br><b>Default value:</b> <code>1000</code>
-				This value is optional.
+				<br>This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -78,7 +79,7 @@ The following properties can be configured:
 			<td>In case you have an sensor outside you can provide the ID here. This is used to calculate ventilation effects.<br>
 				<br><b>Possible values:</b> <code>158d020172841d</code>
 				<br><b>Default value:</b> <code>none</code>
-				This value is optional.
+				<br>This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -86,7 +87,7 @@ The following properties can be configured:
 			<td>Shows an icon in case ventilation is recommended<br>
 				<br><b>Possible values:</b> <code>true</code>
 				<br><b>Default value:</b> <code>false</code>
-				This value is optional.
+				<br>This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -94,7 +95,7 @@ The following properties can be configured:
 			<td>Shows an icon for the open state of the door/window sensors.<br>
 				<br><b>Possible values:</b> <code>true</code>
 				<br><b>Default value:</b> <code>false</code>
-				This value is optional.
+				<br>This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -102,7 +103,7 @@ The following properties can be configured:
 			<td>Shows an icon for the state of lights in the room.<br>
 				<br><b>Possible values:</b> <code>true</code>
 				<br><b>Default value:</b> <code>false</code>
-				This value is optional.
+				<br>This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -110,7 +111,7 @@ The following properties can be configured:
 			<td>Shows an icon for the heating state of the MAX! system.<br>
 				<br><b>Possible values:</b> <code>true</code>
 				<br><b>Default value:</b> <code>false</code>
-				This value is optional.
+				<br>This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -118,7 +119,7 @@ The following properties can be configured:
 			<td>Wether to enable audio notifications on temperature and humidity alarms. You need a MM with speakers or audio device connected. See https://www.raspberrypi.org/documentation/configuration/audio-config.md for help on setting up audio on a raspberry.<br>
 				<br><b>Possible values:</b> <code>true</code>
 				<br><b>Default value:</b> <code>false</code>
-				This value is optional.
+				<br>This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -126,7 +127,7 @@ The following properties can be configured:
 			<td>Minimum temperature for indoor rooms. In case temperature drops below this value a notification is displayed (optionally also audio notification).<br>
 				<br><b>Possible values:</b> <code>18</code>
 				<br><b>Default value:</b> <code>17</code>
-				This value is optional.
+				<br>This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -134,7 +135,7 @@ The following properties can be configured:
 			<td>Maximum humidity for indoor rooms. In case humidity exceeds this value a notification is displayed (optionally also audio notification).<br>
 				<br><b>Possible values:</b> <code>70</code>
 				<br><b>Default value:</b> <code>68</code>
-				This value is optional.
+				<br>This value is optional.
 			</td>
 		</tr>
 		<tr>
@@ -146,7 +147,7 @@ The following properties can be configured:
 		            	devices : ['158d000171240d', '158d00026cddae']
 	            	}]</code>
 				<br><b>Default value:</b> <code>none</code>
-				At least one room has to be defined in order for this module to work properly.
+				<br>At least one room has to be defined in order for this module to work properly.
 			</td>
 		</tr>
 	</tbody>
