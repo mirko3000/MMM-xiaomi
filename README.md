@@ -147,7 +147,7 @@ The following properties can be configured:
 	</tbody>
 </table>
 
-## Room configuration options
+### Room configuration options
 
 <table width="100%">
 	<!-- why, markdown... -->
@@ -185,7 +185,7 @@ The following properties can be configured:
 Example:
 ````javascript
 modules: [
-    {
+	{
 		module: 'MMM-xiaomi',
 		position: 'bottom_left',
 		header: 'Temperature / Humidity',  // This is optional
@@ -193,21 +193,21 @@ modules: [
 			gatewayIP: '192.168.0.1',
 			outsideSensorId: '158d0001618421',
 			showWindow: true,
-	        showVentilation: true,
-	        showLights: false,
-	        audioNotifications: true,
-	        rooms:  [
-	            	{
-		            	name: 'Living room',
-		            	sortOrder: 10,
-		            	devices : ['158d000171840d', '158d00016ccdae']
-	            	},
-	            	{
-		            	name: 'Bedroom',
-		            	sortOrder: 20,
-		            	devices : ['158d0001635ac2']
-	            	},
-	        ]
+			showVentilation: true,
+			showLights: false,
+			audioNotifications: true,
+			rooms:  [
+				{
+					name: 'Living room',
+					sortOrder: 10,
+					devices : ['158d000171840d', '158d00016ccdae']
+				},
+				{
+					name: 'Bedroom',
+					sortOrder: 20,
+					devices : ['158d0001635ac2']
+				},
+			]
 		}
 	},
 
