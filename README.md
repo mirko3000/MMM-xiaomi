@@ -56,7 +56,7 @@ The following properties can be configured:
 				<br><b>Possible values:</b> <code>192.168.1.100</code>
 				<br><b>Default value:</b> <code>192.168.0.1</code>
 			</td>
-			<br>This value is <bold>mandatory</bold>
+			<br>This value is <b>mandatory</b>
 		</tr>
 		<tr>
 			<td><code>gatewayToken</code></td>
