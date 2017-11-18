@@ -55,8 +55,8 @@ The following properties can be configured:
 			<td>The IP address of your Xiaomi smarthome gateway.<br>
 				<br><b>Possible values:</b> <code>192.168.1.100</code>
 				<br><b>Default value:</b> <code>192.168.0.1</code>
+				<br>This value is <b>mandatory</b>
 			</td>
-			<br>This value is <b>mandatory</b>
 		</tr>
 		<tr>
 			<td><code>gatewayToken</code></td>
