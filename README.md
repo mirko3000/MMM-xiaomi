@@ -82,9 +82,10 @@ The following properties can be configured:
 				<br>This value is optional.
 			</td>
 		</tr>
+
 		<tr>
-			<td><code>showVentilation</code></td>
-			<td>Shows an icon in case ventilation is recommended<br>
+			<td><code>showTend</code></td>
+			<td>Shows an icon indicating temperature and humidity trend (up, down, equal)<br>
 				<br><b>Possible values:</b> <code>true</code>
 				<br><b>Default value:</b> <code>false</code>
 				<br>This value is optional.

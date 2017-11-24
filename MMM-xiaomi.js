@@ -20,6 +20,7 @@ Module.register('MMM-xiaomi', {
     showWindow: false,
     showVentilation: true,
     showLights: false,
+    showTrend: false,
     audioNotifications: false,
     minTemperature: 17,
     maxHumidity: 68
@@ -96,8 +97,9 @@ Module.register('MMM-xiaomi', {
     table: '<table class="xsmall">{0}</table>',
     // Row parameters: 0: room name, 1: temperature, 2: humidity
     col: '<td align="left" class="normal light small">{0}</td>',
-    colTemperature: '<td align="center" class="fa fa-angle-{1}"></td><td align="left" class="dimmed light xsmall">{0}°C</td>',
-    colHumidity: '<td align="center" class="fa fa-angle-{1}"></td><td align="left" class="dimmed light xsmall">{0}%</td>',
+    colTrend: '<td align="center" class="fa fa-angle-{0}"></td>',
+    colTemperature: '<td align="left" class="dimmed light xsmall">{0}°C</td>',
+    colHumidity: '<td align="left" class="dimmed light xsmall">{0}%</td>',
     colVentilationIcon: '<td align="center" class="fa fa-1 fa-refresh {0} xiaomi-icon"></td>',
     colWindowIcon: '<td align="center" class="fa fa-1 fa-star {0} xiaomi-icon"></td>',
     colLightIcon: '<td align="center" class="fa fa-1 fa-power-off {0} xiaomi-icon"></td>',
@@ -202,17 +204,7 @@ Module.register('MMM-xiaomi', {
               // Check for alerts
               if (sensor.id != self.config.outsideSensorId && sensor.temperature < self.config.minTemperature) {
                 //Show alert on UI
-                self.sendNotification("SHOW_ALERT", {
-                  title: "Critical temperature",
-                  message: "<span>Temperature in room " + room.name + " below " + self.config.minTemperature + "°C<span>",
-                  imageFA: "thermometer-1"
-                });
-                self.sendSocketNotification("PLAY_SOUND", "bell.wav");
-                // Hide notification after 10 seconds
-                setTimeout(function(){ 
-                  self.sendNotification("HIDE_ALERT"); 
-                  
-                }, 10000); 
+                self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " below " + self.config.minTemperature + "°C<span>");
               }
             }
             else if (event.property === "humidity") {
@@ -222,16 +214,7 @@ Module.register('MMM-xiaomi', {
               // Check for alerts
               if (sensor.id != self.config.outsideSensorId && sensor.humidity >= self.config.maxHumidity) {
                 //Show alert on UI
-                self.sendNotification("SHOW_ALERT", {
-                  title: "Critical humidity",
-                  message: "<span>Humidity in room " + room.name + " above " + self.config.maxHumidity + "%<span>",
-                  imageFA: "thermometer-1"
-                });
-                self.sendSocketNotification("PLAY_SOUND", "bell.wav");
-                // Hide notification after 10 seconds
-                setTimeout(function(){ 
-                  self.sendNotification("HIDE_ALERT"); 
-                }, 10000); 
+                self.showNotification("Critical humidity", "<span>Humidity in room " + room.name + " above " + self.config.maxHumidity + "%<span>");
               }
             }   
             return;
@@ -272,6 +255,27 @@ Module.register('MMM-xiaomi', {
       }      
     } 
 
+  },
+
+  showNotification: function(title, text) {
+
+    //Show alert on UI
+    this.sendNotification("SHOW_ALERT", {
+      title: title,
+      message: text,
+      imageFA: "thermometer-1"
+    });
+    
+    // Play sound notitfication (only between daytime hours)
+    var date = Date.now()
+    if (date.hours >= 8 && date.hours < 22) {
+      this.sendSocketNotification("PLAY_SOUND", "bell.wav"); 
+    }
+
+    // Hide notification after 10 seconds
+    setTimeout(function(){ 
+      this.sendNotification("HIDE_ALERT"); 
+    }, 10000); 
   },
 
   // Add current sensor value to history and calculate trend based on the last two values. Only
@@ -478,8 +482,14 @@ Module.register('MMM-xiaomi', {
 
           // Fist the basic column date (room name, temperature and humidity)
           var currCol = this.html.col.format(room.name, temp, humid);
-          currCol += this.html.colTemperature.format(temp, temperatureTrend);
-          currCol += this.html.colHumidity.format(humid, humidityTrend);
+          if (this.config.showTrend) {
+            currCol += this.html.colTrend.format(temperatureTrend)
+          }
+          currCol += this.html.colTemperature.format(temp);
+          if (this.config.showTrend) {
+            currCol += this.html.colTrend.format(humidityTrend)
+          }
+          currCol += this.html.colHumidity.format(humid);
 
 
           if (this.config.showVentilation) {
