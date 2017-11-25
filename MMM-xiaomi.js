@@ -88,7 +88,7 @@ Module.register('MMM-xiaomi', {
     }else { 
       content = this.dom;
     }
-    return $('<div class="xiaomi">'+content+'</div>')[0];
+    return $('<div class="xm-xiaomi">'+content+'</div>')[0];
   },
 
 
@@ -100,17 +100,17 @@ Module.register('MMM-xiaomi', {
     colTrend: '<td align="center" class="fa fa-angle-{0}"></td>',
     colTemperature: '<td align="left" class="dimmed light xsmall">{0}°C</td>',
     colHumidity: '<td align="left" class="dimmed light xsmall">{0}%</td>',
-    colVentilationIcon: '<td align="center" class="fa fa-1 fa-refresh {0} xiaomi-icon"></td>',
-    colWindowIcon: '<td align="center" class="fa fa-1 fa-star {0} xiaomi-icon"></td>',
-    colLightIcon: '<td align="center" class="fa fa-1 fa-power-off {0} xiaomi-icon"></td>',
+    colVentilationIcon: '<td align="center" class="fa fa-1 fa-refresh {0} xm-icon"></td>',
+    colWindowIcon: '<td align="center" class="fa fa-1 fa-star {0} xm-icon"></td>',
+    colLightIcon: '<td align="center" class="fa fa-1 fa-power-off {0} xm-icon"></td>',
     colHeatingIcon: '<td align="center" class="fa fa-fire {0}">',
     row: '<tr>{0}{1}</tr>',
     loading: '<div class="dimmed light xsmall">Connecting to Xiaomi gateway...</div>',
     
     // For grid layout
     // roomDiv parameter: 0: room position (left/right), 1: room name, 2: temperature, 3: humidity, 4: door state, 5: light state, 6: vent state
-    roomDiv: '<div class="room {0} normal light small"><div class="room-header">{1}</div><div class="room-temp-humid"><div class="room-temp">{2}°C</div><div class="room-humid">{3}%</div></div><div class="room-icons"><div class="door-icon">{4}</div><div class="light-icon">{5}</div><div class="vent-icon">{6}</div></div></div>',
-    roomContainerDiv: '<div class="room-container">{0}</div>'
+    roomDiv: '<div class="xm-room {0} normal light small"><div class="xm-room-header">{1}</div><div class="xm-room-temp-humid"><div class="xm-room-temp">{2}°C</div><div class="xm-room-humid">{3}%</div></div><div class="xm-room-icons"><div class="xm-door-icon">{4}</div><div class="xm-light-icon">{5}</div><div class="xm-vent-icon">{6}</div></div></div>',
+    roomContainerDiv: '<div class="xm-room-container">{0}</div>'
   },
 
 
@@ -493,26 +493,26 @@ Module.register('MMM-xiaomi', {
 
 
           if (this.config.showVentilation) {
-            var ventIcon = room.ventilatationUseful ? "" : "disabled";
+            var ventIcon = room.ventilatationUseful ? "" : "xm-disabled";
             currCol += this.html.colVentilationIcon.format(ventIcon);
           }
 
           if (this.config.showWindow) {
             var windowOpen = $.grep(room.windows, function(window){ return window.open == true });
-            var windowIcon = (windowOpen.length > 0) ? "" : "disabled";
+            var windowIcon = (windowOpen.length > 0) ? "" : "xm-disabled";
 
             currCol += this.html.colWindowIcon.format(windowIcon);
           }
 
           if (this.config.showLights) {
             var lightsOn = $.grep(room.lights, function(light){ return light.power == true });
-            var lightsIcon = (lightsOn.length > 0) ? "" : "disabled";
+            var lightsIcon = (lightsOn.length > 0) ? "" : "xm-disabled";
 
             currCol += this.html.colLightIcon.format(lightsIcon);
           }
 
           if (this.config.showHeating) {
-            var heatingIcon = room.heating ? "" : "disabled"; 
+            var heatingIcon = room.heating ? "" : "xm-disabled"; 
             currCol += this.html.colHeatingIcon.format(heatingIcon);
           }
 
