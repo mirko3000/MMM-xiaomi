@@ -49,6 +49,8 @@ Module.register('MMM-xiaomi', {
       if (notification === 'MAX_HEATING_CHANGE') {
         Log.info('recieved MAX_HEATING_CHANGE');
         this.updateHeatingData(payload);
+        this.render();
+        this.updateDom(this.config.animationSpeed);
       }
 
   },
@@ -56,6 +58,7 @@ Module.register('MMM-xiaomi', {
   start: function () {
     Log.info("Starting module: " + this.name);
     this.update();
+
     // refresh every 30 minutes
     setInterval(
       this.update.bind(this),
@@ -117,6 +120,7 @@ Module.register('MMM-xiaomi', {
 
   render: function() {
     this.calculateVentilation();
+
 
     if (this.config.graphicLayout) {
       this.renderGrid(this.roomData);
@@ -260,6 +264,9 @@ Module.register('MMM-xiaomi', {
 
   showNotification: function(title, text) {
     if (this.config.showNotifications) {
+
+      var self = this;
+
       //Show alert on UI
       this.sendNotification("SHOW_ALERT", {
         title: title,
@@ -277,7 +284,7 @@ Module.register('MMM-xiaomi', {
 
       // Hide notification after 10 seconds
       setTimeout(function(){ 
-        this.sendNotification("HIDE_ALERT"); 
+        self.sendNotification("HIDE_ALERT"); 
       }, 10000);       
     }
   },
