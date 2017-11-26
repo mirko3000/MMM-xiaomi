@@ -20,7 +20,8 @@ Module.register('MMM-xiaomi', {
     showWindow: false,
     showVentilation: true,
     showLights: false,
-    showTrend: false,
+    showTrend: true,
+    showNotifications: true,
     audioNotifications: false,
     minTemperature: 17,
     maxHumidity: 68
@@ -258,24 +259,27 @@ Module.register('MMM-xiaomi', {
   },
 
   showNotification: function(title, text) {
+    if (this.config.showNotifications) {
+      //Show alert on UI
+      this.sendNotification("SHOW_ALERT", {
+        title: title,
+        message: text,
+        imageFA: "thermometer-1"
+      });
+      
+      if (this.config.audioNotifications) {
+        // Play sound notitfication (only between daytime hours)
+        var date = Date.now()
+        if (date.hours >= 8 && date.hours < 22) {
+          this.sendSocketNotification("PLAY_SOUND", "bell.wav"); 
+        }        
+      }
 
-    //Show alert on UI
-    this.sendNotification("SHOW_ALERT", {
-      title: title,
-      message: text,
-      imageFA: "thermometer-1"
-    });
-    
-    // Play sound notitfication (only between daytime hours)
-    var date = Date.now()
-    if (date.hours >= 8 && date.hours < 22) {
-      this.sendSocketNotification("PLAY_SOUND", "bell.wav"); 
+      // Hide notification after 10 seconds
+      setTimeout(function(){ 
+        this.sendNotification("HIDE_ALERT"); 
+      }, 10000);       
     }
-
-    // Hide notification after 10 seconds
-    setTimeout(function(){ 
-      this.sendNotification("HIDE_ALERT"); 
-    }, 10000); 
   },
 
   // Add current sensor value to history and calculate trend based on the last two values. Only

@@ -82,12 +82,11 @@ The following properties can be configured:
 				<br>This value is optional.
 			</td>
 		</tr>
-
 		<tr>
 			<td><code>showTend</code></td>
 			<td>Shows an icon indicating temperature and humidity trend (up, down, equal)<br>
 				<br><b>Possible values:</b> <code>true</code>
-				<br><b>Default value:</b> <code>false</code>
+				<br><b>Default value:</b> <code>true</code>
 				<br>This value is optional.
 			</td>
 		</tr>
@@ -115,6 +114,14 @@ The following properties can be configured:
 				<br>This value is optional.
 			</td>
 		</tr>
+		<tr>
+			<td><code>showNotifications</code></td>
+			<td>Wether to enable visual notifications on temperature and humidity alarms.<br>
+				<br><b>Possible values:</b> <code>true</code>
+				<br><b>Default value:</b> <code>true</code>
+				<br>This value is optional.
+			</td>
+		</tr>		
 		<tr>
 			<td><code>audioNotifications</code></td>
 			<td>Wether to enable audio notifications on temperature and humidity alarms. You need a MM with speakers or audio device connected. See https://www.raspberrypi.org/documentation/configuration/audio-config.md for help on setting up audio on a raspberry.<br>
