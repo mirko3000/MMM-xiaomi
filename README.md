@@ -147,6 +147,14 @@ The following properties can be configured:
 			</td>
 		</tr>
 		<tr>
+			<td><code>celcius</code></td>
+			<td>Wether the temperature should be displayed in celcius (true) or fahrenheit (false).<br>
+				<br><b>Possible values:</b> <code>false</code>
+				<br><b>Default value:</b> <code>true</code>
+				<br>This value is optional.
+			</td>
+		</tr>
+		<tr>
 			<td><code>rooms</code></td>
 			<td>List of configured rooms.
 				<br>See "Room configuration options" options below.

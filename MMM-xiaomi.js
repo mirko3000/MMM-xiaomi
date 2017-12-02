@@ -24,7 +24,8 @@ Module.register('MMM-xiaomi', {
     showNotifications: true,
     audioNotifications: false,
     minTemperature: 17,
-    maxHumidity: 68
+    maxHumidity: 68,
+    celcius: true
   },
 
   // Override socket notification handler.
@@ -102,7 +103,7 @@ Module.register('MMM-xiaomi', {
     // Row parameters: 0: room name, 1: temperature, 2: humidity
     col: '<td align="left" class="normal light small">{0}</td>',
     colTrend: '<td align="center" class="fa fa-angle-{0}"></td>',
-    colTemperature: '<td align="left" class="dimmed light xsmall">{0}°C</td>',
+    colTemperature: '<td align="left" class="dimmed light xsmall">{0}°{1}</td>',
     colHumidity: '<td align="left" class="dimmed light xsmall">{0}%</td>',
     colVentilationIcon: '<td align="center" class="fa fa-1 fa-refresh {0} xm-icon"></td>',
     colWindowIcon: '<td align="center" class="fa fa-1 fa-star {0} xm-icon"></td>',
@@ -487,6 +488,12 @@ Module.register('MMM-xiaomi', {
             humidityTrend = room.sensors[0].humidityTrend
           }
 
+          // Convert temperature to kelving if requried
+          if (!this.config.celcius) {
+            // C = (5/9) * (F - 32)
+            temp = temp * 9 / 5 + 32;
+          }
+
           // Format temperatur and humidity by rounding
           temp = Math.round(temp * 10) / 10
           humid = Math.round(humid)
@@ -496,7 +503,7 @@ Module.register('MMM-xiaomi', {
           if (this.config.showTrend) {
             currCol += this.html.colTrend.format(temperatureTrend)
           }
-          currCol += this.html.colTemperature.format(temp);
+          currCol += this.html.colTemperature.format(temp, this.config.celcius ? "C" : "F");
           if (this.config.showTrend) {
             currCol += this.html.colTrend.format(humidityTrend)
           }
