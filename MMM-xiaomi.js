@@ -277,8 +277,8 @@ Module.register('MMM-xiaomi', {
       
       if (this.config.audioNotifications) {
         // Play sound notitfication (only between daytime hours)
-        var date = Date.now()
-        if (date.hours >= 8 && date.hours < 22) {
+        var date = new Date()
+        if (date.getHours() >= 8 && date.getHours() < 22) {
           this.sendSocketNotification("PLAY_SOUND", "bell.wav"); 
         }        
       }
