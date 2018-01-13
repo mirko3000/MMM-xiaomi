@@ -24,6 +24,7 @@ Module.register('MMM-xiaomi', {
     showNotifications: true,
     audioNotifications: false,
     minTemperature: 17,
+    maxTemperature: 99,
     maxHumidity: 68,
     celcius: true
   },
@@ -211,6 +212,10 @@ Module.register('MMM-xiaomi', {
               if (sensor.id != self.config.outsideSensorId && sensor.temperature < self.config.minTemperature) {
                 //Show alert on UI
                 self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " below " + self.config.minTemperature + "°C<span>");
+              }
+              if (sensor.id != self.config.outsideSensorId && sensor.temperature > self.config.maxTemperature) {
+                //Show alert on UI
+                self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " above " + self.config.maxTemperature + "°C<span>");
               }
             }
             else if (event.property === "humidity") {

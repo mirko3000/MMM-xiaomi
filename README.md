@@ -139,6 +139,14 @@ The following properties can be configured:
 			</td>
 		</tr>
 		<tr>
+			<td><code>maxTemperature</code></td>
+			<td>Maximum temperature for indoor rooms. In case temperature raises above this value a notification is displayed (optionally also audio notification).<br>
+				<br><b>Possible values:</b> <code>22</code>
+				<br><b>Default value:</b> <code>99</code>
+				<br>This value is optional.
+			</td>
+		</tr>
+		<tr>
 			<td><code>maxHumidity</code></td>
 			<td>Maximum humidity for indoor rooms. In case humidity exceeds this value a notification is displayed (optionally also audio notification).<br>
 				<br><b>Possible values:</b> <code>70</code>
