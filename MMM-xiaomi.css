@@ -2,6 +2,14 @@
     position: relative;
 }
 
+.xm-xiaomi .xsmall {
+  font-size: 20px;
+}
+
+.xm-xiaomi .small {
+  font-size: 24px;
+}
+
 .xm-disabled {
   color: black;
 }

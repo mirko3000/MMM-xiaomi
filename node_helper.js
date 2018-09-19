@@ -15,6 +15,7 @@ const path       = require('path');
 const miio = require('miio');
 
 var deviceList = {};
+var self;
 
 module.exports = NodeHelper.create({
 
@@ -22,6 +23,7 @@ module.exports = NodeHelper.create({
   start: function () {
     console.log("Starting xiaomi helper");
     this.deviceList = {};
+    self = this;
   },
 
   //Subclass socketNotificationReceived received.
@@ -66,39 +68,52 @@ module.exports = NodeHelper.create({
       if(! reg.device) return;
       console.log(new Date() + ": Gateway error");
     });
+    //console.log(gateway.syncer.children);
+    //console.log(gateway.syncer.children);
+    for (var [key, value] of gateway.syncer.children) {
 
-    for (var i = 0; i < gateway.devices.length; i++) { 
-      var currentDevice = gateway.devices[i]
-      console.log("Found device with ID " + currentDevice.id  + " of type " + currentDevice.type)
+      var currentDevice = value
+      // console.log(currentDevice);
+      console.log("Found device with ID " + currentDevice.internalId  + " of type " + currentDevice.miioModel)
 
       // Register property change listener (only if not already known)
       //if (!this.deviceList[currentDevice.id]) {
-        currentDevice.on('propertyChanged', e => self.propertyChanged(e));
+        //const handler = (val, thing) => console.log('Value is now', val, 'for thing', thing.internalId);
+        //currentDevice.on('temperatureChanged', this.propertyChanged);
+        //currentDevice.on('relativeHumidityChanged', this.propertyChanged);
+        currentDevice.on('stateChanged', this.propertyChanged);
+        //currentDevice.on('temperatureChanged', e => self.propertyChanged(e));
         //this.deviceList[currentDevice.id] = currentDevice;
       //}
-
       // Handle different devices types
-      if (currentDevice.type === 'sensor') {
+      if (currentDevice.miioModel === 'lumi.sensor_ht') {
+        // console.log(currentDevice);
         var newDev = {};
-        newDev.temperature = currentDevice.temperature;
-        newDev.humidity = currentDevice.humidity;
-        newDev.id = currentDevice.id;
-        newDev.type = currentDevice.type;
+        currentDevice.temperature()
+            .then(result => newDev.temperature = result.value)
+            .catch(err => console.log('Error occurred:', err));
+        currentDevice.relativeHumidity()
+            .then(result => newDev.humidity = result.value)
+            .catch(err => console.log('Error occurred:', err));
+        newDev.id = currentDevice.internalId;
+        newDev.type = currentDevice.miioModel;
         sensors[index++] = newDev
       }
-      if (currentDevice.type === 'magnet') {
+      if (currentDevice.miioModel === 'lumi.magnet') {
+        
         var newDev = {};
         newDev.open = currentDevice.property('open');
-        newDev.id = currentDevice.id;
-        newDev.type = currentDevice.type;
+        newDev.id = currentDevice.internalId;
+        newDev.type = currentDevice.miioModel;
         sensors[index++] = newDev
       }
-      if (currentDevice.type === 'light') {
+      if (currentDevice.metadata.types.has('light')) {
         var newDev = {};
-        newDev.power = currentDevice.property('power');
-        newDev.id = currentDevice.id;
-        newDev.type = currentDevice.type;
-        sensors[index++] = newDev
+        
+        //newDev.power = currentDevice.property('power');
+        //newDev.id = currentDevice.id;
+        //newDev.type = currentDevice.type;
+        //sensors[index++] = newDev
       }
     }
 
@@ -106,9 +121,15 @@ module.exports = NodeHelper.create({
   },
 
 
-  propertyChanged: function(event) {
-    // console.log(new Date() + ": " + event.id + " updated property '" + event.property + "' (" + event.oldValue + " --> " + event.value + ")");
-    this.sendSocketNotification('XIAOMI_CHANGEDATA', event);
+  propertyChanged: function(event, source) {
+    //console.log(event);
+    //console.log(source.internalId);
+    var myEvent = {};
+    myEvent.id = source.internalId;
+    myEvent.property = event.key;
+    myEvent.value = event.value;
+    console.log(new Date() + ": " + myEvent.id + " updated property '" + myEvent.property + "' to value " + myEvent.value);
+    self.sendSocketNotification('XIAOMI_CHANGEDATA', myEvent);
   },
 
   /**

@@ -164,7 +164,7 @@ Module.register('MMM-xiaomi', {
 
           if (find.length > 0) {
 
-            if (find[0].type === 'sensor') {
+            if (find[0].type === 'lumi.sensor_ht') {
               // Initialize trends with default
               find[0].temperatureTrend = 'right';
               find[0].humidityTrend = 'right';
@@ -176,7 +176,7 @@ Module.register('MMM-xiaomi', {
               // Add light to room list
               roomObject.lights[roomObject.lights.length] = find[0];
             }
-            else if (find[0].type === 'magnet') {
+            else if (find[0].type === 'lumi.magnet') {
               // Add magnet to room list
               roomObject.windows[roomObject.windows.length] = find[0];
             }
@@ -206,7 +206,7 @@ Module.register('MMM-xiaomi', {
 
             if (event.property === "temperature") {
               // Update temperature
-              sensor.temperature = event.value;
+              sensor.temperature = event.value.value;
 
               // Check for alerts
               if (sensor.id != self.config.outsideSensorId && sensor.temperature < self.config.minTemperature) {
@@ -218,7 +218,7 @@ Module.register('MMM-xiaomi', {
                 self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " above " + self.config.maxTemperature + "°C<span>");
               }
             }
-            else if (event.property === "humidity") {
+            else if (event.property === "relativeHumidity") {
               // Update humidity
               sensor.humidity = event.value;
 
