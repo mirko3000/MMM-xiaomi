@@ -225,7 +225,7 @@ Module.register('MMM-xiaomi', {
               // Check for alerts
               if (sensor.id != self.config.outsideSensorId && sensor.humidity >= self.config.maxHumidity) {
                 //Show alert on UI
-                self.showNotification("Critical humidity", "<span>Humidity in room " + room.name + " above " + self.config.maxHumidity + "%<span>", "fa-cloud-rain", "soft-bells.wav");
+                self.showNotification("Critical humidity", "<span>Humidity in room " + room.name + " above " + self.config.maxHumidity + "%<span>", "cloud-rain", "Ping-notification-sound.wav");
               }
             }
             return;
@@ -265,7 +265,7 @@ Module.register('MMM-xiaomi', {
         roomObject.heating = (valve > 0);
         // Show a notification for heavy heating (valve opened more than 50%)
         if (payload.valve > 50) {
-          self.showNotification("Heavy heating", "<span>Value in room " + room.name + " opened more than 50%<span>", "fa-fire", "long-chime-sound.wav");
+          self.showNotification("Heavy heating", "<span>Value in room " + room.name + " opened more than 50%<span>", "fire", "long-chime-sound.wav");
         }
       }
     }
