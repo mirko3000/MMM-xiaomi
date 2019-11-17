@@ -24,7 +24,7 @@ Module.register('MMM-xiaomi', {
     showNotifications: true,
     audioNotifications: false,
     minTemperature: 17,
-    maxTemperature: 99,
+    maxTemperature: 23,
     maxHumidity: 68,
     celcius: true
   },
@@ -70,7 +70,7 @@ Module.register('MMM-xiaomi', {
   update: function(){
     this.sendSocketNotification(
       'XIAOMI_CONNECT', {
-          ip : this.config.gatewayIP, 
+          ip : this.config.gatewayIP,
           token: this.config.gatewayToken
       });
 
@@ -91,7 +91,7 @@ Module.register('MMM-xiaomi', {
     var content = '';
     if (!this.loaded) {
       content = this.html.loading;
-    }else { 
+    }else {
       content = this.dom;
     }
     return $('<div class="xm-xiaomi">'+content+'</div>')[0];
@@ -112,7 +112,7 @@ Module.register('MMM-xiaomi', {
     colHeatingIcon: '<td align="center" class="fa fa-fire {0}">',
     row: '<tr>{0}{1}</tr>',
     loading: '<div class="dimmed light xsmall">Connecting to Xiaomi gateway...</div>',
-    
+
     // For grid layout
     // roomDiv parameter: 0: room position (left/right), 1: room name, 2: temperature, 3: humidity, 4: door state, 5: light state, 6: vent state
     roomDiv: '<div class="xm-room {0} normal light small"><div class="xm-room-header">{1}</div><div class="xm-room-temp-humid"><div class="xm-room-temp">{2}°C</div><div class="xm-room-humid">{3}%</div></div><div class="xm-room-icons"><div class="xm-door-icon">{4}</div><div class="xm-light-icon">{5}</div><div class="xm-vent-icon">{6}</div></div></div>',
@@ -168,9 +168,9 @@ Module.register('MMM-xiaomi', {
               // Initialize trends with default
               find[0].temperatureTrend = 'right';
               find[0].humidityTrend = 'right';
-              // Add sensor to room 
+              // Add sensor to room
               roomObject.sensors[roomObject.sensors.length] = find[0];
-              
+
             }
             else if (find[0].type === 'light') {
               // Add light to room list
@@ -196,7 +196,7 @@ Module.register('MMM-xiaomi', {
     // Find the sensor from which the event occured
       for (var key in this.roomData) {
         var room = this.roomData[key];
-        
+
         var self = this;
 
         // Check temperature sensors
@@ -213,7 +213,7 @@ Module.register('MMM-xiaomi', {
                 //Show alert on UI
                 self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " below " + self.config.minTemperature + "°C<span>");
               }
-              if (sensor.id != self.config.outsideSensorId && sensor.temperature > self.config.maxTemperature) {
+              if (sensor.id != self.config.outsideSensorId && sensor.temperature > self.config.maxTemperature && sensor.temperature > this.outsideTemp) {
                 //Show alert on UI
                 self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " above " + self.config.maxTemperature + "°C<span>");
               }
@@ -225,9 +225,9 @@ Module.register('MMM-xiaomi', {
               // Check for alerts
               if (sensor.id != self.config.outsideSensorId && sensor.humidity >= self.config.maxHumidity) {
                 //Show alert on UI
-                self.showNotification("Critical humidity", "<span>Humidity in room " + room.name + " above " + self.config.maxHumidity + "%<span>");
+                self.showNotification("Critical humidity", "<span>Humidity in room " + room.name + " above " + self.config.maxHumidity + "%<span>", "fa-cloud-rain", "soft-bells.wav");
               }
-            }   
+            }
             return;
           }
         });
@@ -247,7 +247,7 @@ Module.register('MMM-xiaomi', {
             return;
           }
         });
-      } 
+      }
     }
   },
 
@@ -263,12 +263,15 @@ Module.register('MMM-xiaomi', {
 
       if (roomObject) {
         roomObject.heating = (valve > 0);
-      }      
-    } 
-
+        // Show a notification for heavy heating (valve opened more than 50%)
+        if (payload.valve > 50) {
+          self.showNotification("Heavy heating", "<span>Value in room " + room.name + " opened more than 50%<span>", "fa-fire", "long-chime-sound.wav");
+        }
+      }
+    }
   },
 
-  showNotification: function(title, text) {
+  showNotification: function(title, text, image, sound) {
     if (this.config.showNotifications) {
 
       var self = this;
@@ -277,21 +280,23 @@ Module.register('MMM-xiaomi', {
       this.sendNotification("SHOW_ALERT", {
         title: title,
         message: text,
-        imageFA: "thermometer-1"
+        imageFA: image || "thermometer-1"
       });
-      
+
       if (this.config.audioNotifications) {
         // Play sound notitfication (only between daytime hours)
         var date = new Date()
+        var s = sound || "bell.wav"
+
         if (date.getHours() >= 8 && date.getHours() < 22) {
-          this.sendSocketNotification("PLAY_SOUND", "bell.wav"); 
-        }        
+          this.sendSocketNotification("PLAY_SOUND", s);
+        }
       }
 
       // Hide notification after 10 seconds
-      setTimeout(function(){ 
-        self.sendNotification("HIDE_ALERT"); 
-      }, 10000);       
+      setTimeout(function(){
+        self.sendNotification("HIDE_ALERT");
+      }, 10000);
     }
   },
 
@@ -382,11 +387,15 @@ Module.register('MMM-xiaomi', {
           if (sensor.id === self.config.outsideSensorId) {
             outsideTemp = sensor.temperature
             outsideHumid = sensor.humidity
-            
+
+            // Store values globally
+            this.outsideTemp = outsideTemp
+            this.outsideHumid = outsideHumid
+
             outsideAbsoluteHumid = self.calculateAbsoluteHumidity(sensor.temperature, sensor.humidity)
-          }          
+          }
         });
-      }    
+      }
     }
 
     // Now calculate the ventialtion effect for each indoor room
@@ -405,11 +414,11 @@ Module.register('MMM-xiaomi', {
           // In case we don't have an outside sensor simply ventilate if we have over 60 % humidity
           if (sensor.humidity > 60) {
             room.ventilatationUseful = true
-          }          
+          }
         }
       });
     }
-    
+
   },
 
 
@@ -535,7 +544,7 @@ Module.register('MMM-xiaomi', {
           }
 
           if (this.config.showHeating) {
-            var heatingIcon = room.heating ? "" : "xm-disabled"; 
+            var heatingIcon = room.heating ? "" : "xm-disabled";
             currCol += this.html.colHeatingIcon.format(heatingIcon);
           }
 
