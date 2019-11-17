@@ -32,7 +32,7 @@ module.exports = NodeHelper.create({
 
       if (payload.token == null || payload.token === "") {
         var device = miio.device({ address: payload.ip})
-        .then(    
+        .then(
           function(gateway) {
             self.getDevices(gateway)
           })
@@ -40,7 +40,7 @@ module.exports = NodeHelper.create({
       }
       else {
         var device = miio.device({ address: payload.ip, token: payload.token })
-          .then(    
+          .then(
             function(gateway) {
               self.getDevices(gateway)
           })
@@ -67,7 +67,7 @@ module.exports = NodeHelper.create({
       console.log(new Date() + ": Gateway error");
     });
 
-    for (var i = 0; i < gateway.devices.length; i++) { 
+    for (var i = 0; i < gateway.devices.length; i++) {
       var currentDevice = gateway.devices[i]
       console.log("Found device with ID " + currentDevice.id  + " of type " + currentDevice.type)
 
@@ -131,8 +131,8 @@ module.exports = NodeHelper.create({
     console.log('Playing ' + filename + ' with ' + delay + 'ms delay', true);
 
     setTimeout(() => {
-      new Player(path.normalize(__dirname + '/sounds/' + filename)).play();
+      new Player(path.normalize(soundfile)).play();
     }, delay);
-      
+
     },
 });
