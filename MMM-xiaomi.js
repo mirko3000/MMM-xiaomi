@@ -211,11 +211,11 @@ Module.register('MMM-xiaomi', {
               // Check for alerts
               if (sensor.id != self.config.outsideSensorId && sensor.temperature < self.config.minTemperature) {
                 //Show alert on UI
-                self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " below " + self.config.minTemperature + "°C<span>");
+                self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " below " + self.config.minTemperature + "°C<span>", "thermometer-1", "bell.wav");
               }
               if (sensor.id != self.config.outsideSensorId && sensor.temperature > self.config.maxTemperature && sensor.temperature > this.outsideTemp) {
                 //Show alert on UI
-                self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " above " + self.config.maxTemperature + "°C<span>");
+                self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " above " + self.config.maxTemperature + "°C<span>", "thermometer-1", "bell.wav");
               }
             }
             else if (event.property === "humidity") {
@@ -280,13 +280,13 @@ Module.register('MMM-xiaomi', {
       this.sendNotification("SHOW_ALERT", {
         title: title,
         message: text,
-        imageFA: image || "thermometer-1"
+        imageFA:  image
       });
 
       if (this.config.audioNotifications) {
         // Play sound notitfication (only between daytime hours)
         var date = new Date()
-        var s = sound || "bell.wav"
+        var s = sound
 
         if (date.getHours() >= 8 && date.getHours() < 22) {
           this.sendSocketNotification("PLAY_SOUND", s);
