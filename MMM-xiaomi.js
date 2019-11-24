@@ -208,15 +208,18 @@ Module.register('MMM-xiaomi', {
               // Update temperature
               sensor.temperature = event.value;
 
-              // Check for alerts
-              if (sensor.id != self.config.outsideSensorId && sensor.temperature < self.config.minTemperature) {
-                //Show alert on UI
-                self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " below " + self.config.minTemperature + "°C<span>", "thermometer-1", "bell.wav");
-              }
-              if (sensor.id != self.config.outsideSensorId && sensor.temperature > self.config.maxTemperature && sensor.temperature > this.outsideTemp) {
-                //Show alert on UI
-                self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " above " + self.config.maxTemperature + "°C<span>", "thermometer-1", "bell.wav");
-              }
+              // Check for alerts - except for outside sensor
+              if (sensor.id != self.config.outsideSensorId) {
+
+                // Alert if temperature is below min temp - not enough heating or windows open
+                if (sensor.temperature < self.config.minTemperature) {
+                  self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " below " + self.config.minTemperature + "°C<span>", "thermometer-1", "bell.wav");
+                }
+                // Alert if temperature is above max temp and above outside temperature  - excessive heating
+                if (sensor.temperature > self.config.maxTemperature && sensor.temperature > this.outsideTemp) {
+                  self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " above " + self.config.maxTemperature + "°C<span>", "thermometer-1", "bell.wav");
+                }
+
             }
             else if (event.property === "humidity") {
               // Update humidity
@@ -236,6 +239,12 @@ Module.register('MMM-xiaomi', {
         room.windows.forEach(function (window) {
           if (window.id === event.id) {
             window.open = event.value;
+
+            // Check if window is open and heating is on
+            if (window.open && room.heating) {
+              self.showNotification("Window open", "<span>Window in room " + room.name + " is open and heating on<span>", "exclamation-triangle", "cuckoo-cuckoo-clock.wav");
+            }
+
             return;
           }
         });
