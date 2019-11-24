@@ -219,7 +219,7 @@ Module.register('MMM-xiaomi', {
                 if (sensor.temperature > self.config.maxTemperature && sensor.temperature > this.outsideTemp) {
                   self.showNotification("Critical temperature", "<span>Temperature in room " + room.name + " above " + self.config.maxTemperature + "°C<span>", "thermometer-1", "bell.wav");
                 }
-
+              }
             }
             else if (event.property === "humidity") {
               // Update humidity
