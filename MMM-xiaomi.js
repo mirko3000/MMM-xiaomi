@@ -274,8 +274,16 @@ Module.register('MMM-xiaomi', {
         roomObject.heating = (valve > 0);
         // Show a notification for heavy heating (valve opened more than 50%)
         if (payload.valve > 50) {
-          self.showNotification("Heavy heating", "<span>Value in room " + room.name + " opened more than 50%<span>", "fire", "long-chime-sound.wav");
+          self.showNotification("Heavy heating", "<span>Value in room " + roomObject.name + " opened more than 50%<span>", "fire", "long-chime-sound.wav");
         }
+
+        // Show notification if any window in the room is open
+        roomObject.windows.forEach(function (window) {
+          // Check if window is open and heating is on
+          if (window.open && roomObject.heating) {
+            self.showNotification("Window open", "<span>Window in room " + roomObject.name + " is open and heating on<span>", "exclamation-triangle", "cuckoo-cuckoo-clock.wav");
+          }
+        });
       }
     }
   },
