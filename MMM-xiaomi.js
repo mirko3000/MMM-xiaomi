@@ -109,6 +109,7 @@ Module.register('MMM-xiaomi', {
     colVentilationIcon: '<td align="center" class="fa fa-1 fa-refresh {0} xm-icon"></td>',
     colWindowIcon: '<td align="center" class="fa fa-1 fa-star {0} xm-icon"></td>',
     colLightIcon: '<td align="center" class="fa fa-1 fa-power-off {0} xm-icon"></td>',
+    colPlugIcon: '<td align="center" class="fa fa-1 fa-plug {0} xm-icon"></td>',
     colHeatingIcon: '<td align="center" class="fa fa-fire {0}">',
     row: '<tr>{0}{1}</tr>',
     loading: '<div class="dimmed light xsmall">Connecting to Xiaomi gateway...</div>',
@@ -158,6 +159,7 @@ Module.register('MMM-xiaomi', {
         roomObject.sensors = []
         roomObject.lights = []
         roomObject.windows = []
+        roomObject.plugs = []
         for (var i = 0; i < room.devices.length; i++) {
           // find device in sensor data
           var find = $.grep(data, function(e){ return e.id == room.devices[i] });
@@ -179,6 +181,10 @@ Module.register('MMM-xiaomi', {
             else if (find[0].type === 'magnet') {
               // Add magnet to room list
               roomObject.windows[roomObject.windows.length] = find[0];
+            }
+            else if (find[0].type === 'power-plug') {
+              // Add plug to room list
+              roomObject.plugs[roomObject.plugs.length] = find[0];
             }
           }
         }
@@ -253,6 +259,14 @@ Module.register('MMM-xiaomi', {
         room.lights.forEach(function (light) {
           if (light.id === event.id) {
             light.power = event.value;
+            return;
+          }
+        });
+
+        // Check plugs
+        room.plugs.forEach(function (plug) {
+          if (plug.id === event.id) {
+            plug.power = event.value;
             return;
           }
         });
@@ -558,6 +572,13 @@ Module.register('MMM-xiaomi', {
             var lightsIcon = (lightsOn.length > 0) ? "" : "xm-disabled";
 
             currCol += this.html.colLightIcon.format(lightsIcon);
+          }
+
+          if (this.config.showPlugs) {
+            var plugOn = $.grep(room.plugs, function(plug){ return plug.power == true });
+            var plugIcon = (plugOn.length > 0) ? "" : "xm-disabled";
+
+            currCol += this.html.colPlugIcon.format(plugIcon);
           }
 
           if (this.config.showHeating) {

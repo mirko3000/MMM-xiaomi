@@ -100,6 +100,13 @@ module.exports = NodeHelper.create({
         newDev.type = currentDevice.type;
         sensors[index++] = newDev
       }
+      if (currentDevice.type === 'power-plug') {
+        var newDev = {};
+        newDev.power = currentDevice.property('power');
+        newDev.id = currentDevice.id;
+        newDev.type = currentDevice.type;
+        sensors[index++] = newDev
+      }
     }
 
     this.sendSocketNotification('XIAOMI_INITDATA', sensors);
